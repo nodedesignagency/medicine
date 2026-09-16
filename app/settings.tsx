@@ -5,13 +5,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CloseIcon } from '../src/components/Icons';
 import { Button, Card, Chip, Disclaimer, SectionLabel } from '../src/components/ui';
 import { PROFILE_OPTIONS, ProfileKey } from '../src/logic/advisor';
-import { useCabinet } from '../src/store/cabinet';
+import { HomeStyle, useCabinet } from '../src/store/cabinet';
 import { alpha, colors, radius, type } from '../src/theme';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { settings, setApiKey, setProfile, resetCabinet, medicines } = useCabinet();
+  const { settings, setApiKey, setProfile, setHomeStyle, resetCabinet, medicines } = useCabinet();
   const [draft, setDraft] = useState(settings.apiKey);
   const [saved, setSaved] = useState(false);
 
@@ -32,6 +32,26 @@ export default function SettingsScreen() {
         contentContainerStyle={{ padding: 14, paddingBottom: insets.bottom + 40 }}
       >
         <Card>
+          <SectionLabel>Home design</SectionLabel>
+          <Text style={[type.bodySoft, { fontSize: 13.5, marginBottom: 12 }]}>
+            Two versions of the cabinet screen. Switch freely — your medicines are the same in both.
+          </Text>
+          <View style={styles.wrap}>
+            {([
+              { id: 'glass', label: 'Glass shelves' },
+              { id: 'shelf', label: 'Colour shelves' },
+            ] as { id: HomeStyle; label: string }[]).map((o) => (
+              <Chip
+                key={o.id}
+                label={o.label}
+                active={settings.homeStyle === o.id}
+                onPress={() => setHomeStyle(o.id)}
+              />
+            ))}
+          </View>
+        </Card>
+
+        <Card style={{ marginTop: 12 }}>
           <SectionLabel>Camera recognition</SectionLabel>
           <Text style={[type.bodySoft, { fontSize: 13.5 }]}>
             Without a key the app runs in demo mode: the camera frames the shot and you pick the

@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { DEFAULT_CABINET, MEDICINE_BY_ID } from '../data/medicines';
-import { Medicine } from '../data/types';
+import { Form, Medicine } from '../data/types';
 import { Profile } from '../logic/advisor';
 
 const CABINET_KEY = 'cabinet.items.v1';
@@ -13,6 +13,8 @@ export type CabinetItem = {
   medicineId: string;
   addedAt: number;
   expiresAt: number;
+  /** How much is left in the pack. Optional so cabinets saved before this existed still load. */
+  quantity?: number;
   /** Full record for medicines that came from AI recognition rather than the bundled DB. */
   custom?: Medicine;
 };
@@ -42,6 +44,13 @@ export function expiryLabel(item: CabinetItem, now = Date.now()): string {
  * Seeded cabinets pretend the box was bought at some point in the past, so the shelf
  * shows a believable mix of fresh, nearly-out and already-expired stock on first run.
  */
+/** A drawer at home holds part-used packs, not a shop shelf of sealed boxes. */
+function seedQuantity(m: Medicine): number {
+  const full = fullPack(m.form);
+  const used = (m.shelfLifeMonths * 3) % 5; // 0–4, deterministic per medicine
+  return Math.max(1, full - used * Math.max(1, Math.round(full / 12)));
+}
+
 function seedExpiry(m: Medicine, now: number): number {
   const offsetMonths = ((m.shelfLifeMonths * 7) % 26) - 2;
   // The half-month shift keeps a seeded date off today exactly, which would otherwise
@@ -49,7 +58,49 @@ function seedExpiry(m: Medicine, now: number): number {
   return now + offsetMonths * MONTH + MONTH / 2;
 }
 
-type Settings = { apiKey: string; profile: Profile };
+/** A full pack, by the form the medicine comes in. */
+export function fullPack(form: Form): number {
+  switch (form) {
+    case 'tablet': return 15;
+    case 'capsule': return 10;
+    case 'lozenge': return 8;
+    case 'syrup':
+    case 'liquid': return 100;
+    case 'gel': return 30;
+    case 'cream': return 20;
+    case 'rub': return 25;
+    case 'sachet': return 6;
+    case 'strip': return 10;
+    case 'spray': return 10;
+  }
+}
+
+export function packUnit(form: Form): string {
+  switch (form) {
+    case 'tablet': return 'tablets';
+    case 'capsule': return 'capsules';
+    case 'lozenge': return 'lozenges';
+    case 'syrup':
+    case 'liquid': return 'ml';
+    case 'gel':
+    case 'cream':
+    case 'rub': return 'g';
+    case 'sachet': return 'sachets';
+    case 'strip': return 'strips';
+    case 'spray': return 'ml';
+  }
+}
+
+/** Quantity left, falling back to a full pack for items stored before quantity existed. */
+export function quantityOf(item: CabinetItem | undefined, m: Medicine | undefined): number {
+  if (item?.quantity !== undefined) return item.quantity;
+  return m ? fullPack(m.form) : 0;
+}
+
+/** Which of the two home designs to render. */
+export type HomeStyle = 'glass' | 'shelf';
+
+type Settings = { apiKey: string; profile: Profile; homeStyle: HomeStyle };
 
 type Ctx = {
   ready: boolean;
@@ -63,6 +114,8 @@ type Ctx = {
   remove: (id: string) => void;
   setApiKey: (key: string) => void;
   setProfile: (p: Profile) => void;
+  setHomeStyle: (s: HomeStyle) => void;
+  setQuantity: (id: string, n: number) => void;
   resetCabinet: () => void;
 };
 
@@ -71,7 +124,7 @@ const CabinetContext = createContext<Ctx | null>(null);
 export function CabinetProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
   const [items, setItems] = useState<CabinetItem[]>([]);
-  const [settings, setSettings] = useState<Settings>({ apiKey: '', profile: {} });
+  const [settings, setSettings] = useState<Settings>({ apiKey: '', profile: {}, homeStyle: 'glass' });
 
   // Load once on boot, seeding a starter cabinet the first time the app runs.
   useEffect(() => {
@@ -89,11 +142,18 @@ export function CabinetProvider({ children }: { children: React.ReactNode }) {
             DEFAULT_CABINET.flatMap((id) => {
               const m = MEDICINE_BY_ID[id];
               if (!m) return [];
-              return [{ medicineId: id, addedAt: now, expiresAt: seedExpiry(m, now) }];
+              return [{
+                medicineId: id,
+                addedAt: now,
+                expiresAt: seedExpiry(m, now),
+                quantity: seedQuantity(m),
+              }];
             })
           );
         }
-        if (rawSettings) setSettings({ apiKey: '', profile: {}, ...JSON.parse(rawSettings) });
+        if (rawSettings) {
+          setSettings({ apiKey: '', profile: {}, homeStyle: 'glass', ...JSON.parse(rawSettings) });
+        }
       } catch {
         // A corrupt store should not brick the app — fall back to an empty cabinet.
       } finally {
@@ -136,6 +196,7 @@ export function CabinetProvider({ children }: { children: React.ReactNode }) {
           medicineId: m.id,
           addedAt: now,
           expiresAt: now + m.shelfLifeMonths * MONTH,
+          quantity: fullPack(m.form),
           ...(m.synthetic ? { custom: m } : {}),
         },
       ];
@@ -159,12 +220,19 @@ export function CabinetProvider({ children }: { children: React.ReactNode }) {
       remove,
       setApiKey: (apiKey) => setSettings((s) => ({ ...s, apiKey })),
       setProfile: (profile) => setSettings((s) => ({ ...s, profile })),
+      setHomeStyle: (homeStyle) => setSettings((s) => ({ ...s, homeStyle })),
+      setQuantity: (id, n) =>
+        setItems((prev) =>
+          prev.map((i) => (i.medicineId === id ? { ...i, quantity: Math.max(0, n) } : i))
+        ),
       resetCabinet: () => {
         const now = Date.now();
         setItems(
           DEFAULT_CABINET.flatMap((id) => {
             const m = MEDICINE_BY_ID[id];
-            return m ? [{ medicineId: id, addedAt: now, expiresAt: seedExpiry(m, now) }] : [];
+            return m
+              ? [{ medicineId: id, addedAt: now, expiresAt: seedExpiry(m, now), quantity: seedQuantity(m) }]
+              : [];
           })
         );
       },

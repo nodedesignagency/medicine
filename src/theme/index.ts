@@ -7,6 +7,15 @@ export function alpha(hex: string, a: number) {
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
 }
 
+/** Mix a hex colour toward white (t > 0) or black (t < 0). Used for the 3D container shading. */
+export function shade(hex: string, t: number) {
+  const h = hex.replace('#', '');
+  const n = parseInt(h.length === 3 ? h.split('').map((c) => c + c).join('') : h, 16);
+  const mix = (c: number) => Math.round(t >= 0 ? c + (255 - c) * t : c * (1 + t));
+  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(mix);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
 export const colors = {
   page: '#F1F1F4',
   heroTop: '#D8D2FF',
@@ -49,6 +58,15 @@ export const type = {
     letterSpacing: -1.2,
     color: colors.ink,
   } as TextStyle,
+  /** The editorial serif sentence that heads the glass home screen. */
+  serifDisplay: {
+    fontFamily: serif,
+    fontSize: 33,
+    lineHeight: 43,
+    fontWeight: '400',
+    letterSpacing: -0.2,
+    color: colors.ink,
+  } as TextStyle,
   serifMark: {
     fontFamily: serif,
     fontSize: 26,
@@ -76,6 +94,29 @@ export const shelfTints = {
   daily: '#14B8A6',
   antibiotic: '#6E7B8B',
 } as const;
+
+/**
+ * The second home design: an iridescent wash under white frosted shelves.
+ * Kept separate from `colors` so the original shelf home keeps its own palette.
+ */
+export const glass = {
+  base: '#EDF5FA',
+  washPink: '#F6D2E4',
+  washCyan: '#BCE8F3',
+  washLilac: '#D9D6F8',
+  washWarm: '#FDF0F5',
+  plate: 'rgba(255, 255, 255, 0.3)',
+  plateTop: 'rgba(255, 255, 255, 0.22)',
+  plateFoot: 'rgba(255, 255, 255, 0.46)',
+  plateEdge: 'rgba(255, 255, 255, 0.75)',
+  screw: '#A7B0BB',
+  screwSlot: '#636C77',
+  rule: 'rgba(11, 11, 15, 0.08)',
+  chipIdle: 'rgba(255, 255, 255, 0.62)',
+  chipEdge: 'rgba(255, 255, 255, 0.9)',
+  underline: '#6C5CE7',
+  muted: '#9AA0AA',
+};
 
 export const shadow = {
   card: {

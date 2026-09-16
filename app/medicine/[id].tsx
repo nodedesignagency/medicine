@@ -10,7 +10,7 @@ import { CATEGORY_BY_ID, MEDICINE_BY_ID } from '../../src/data/medicines';
 import { SYMPTOMS, symptomLabel } from '../../src/data/symptoms';
 import { SymptomId } from '../../src/data/types';
 import { advise, PROFILE_OPTIONS, RED_FLAGS } from '../../src/logic/advisor';
-import { expiryLabel, expiryStatus, useCabinet } from '../../src/store/cabinet';
+import { expiryLabel, expiryStatus, packUnit, quantityOf, useCabinet } from '../../src/store/cabinet';
 import { getPending } from '../../src/store/pending';
 import { alpha, colors, radius, shelfTints, type } from '../../src/theme';
 
@@ -22,7 +22,7 @@ export default function MedicineScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { resolve, has, add, remove, itemFor, settings } = useCabinet();
+  const { resolve, has, add, remove, itemFor, settings, setQuantity } = useCabinet();
 
   const medicine = useMemo(
     () => (id ? resolve(id) ?? MEDICINE_BY_ID[id] ?? getPending(id) : undefined),
@@ -49,6 +49,7 @@ export default function MedicineScreen() {
   const tint = shelfTints[medicine.category];
   const category = CATEGORY_BY_ID[medicine.category];
   const advice = picked.length ? advise(medicine, picked, settings.profile) : null;
+  const left = quantityOf(item, medicine);
   const activeProfile = PROFILE_OPTIONS.filter((p) => settings.profile[p.key]);
 
   const toggle = (s: SymptomId) => {
@@ -130,6 +131,42 @@ export default function MedicineScreen() {
               </>
             ) : null}
           </Card>
+
+          {item ? (
+            <Card style={{ marginTop: 12 }}>
+              <SectionLabel>How much is left</SectionLabel>
+              <View style={styles.stepperRow}>
+                <Pressable
+                  onPress={() => { tap(); setQuantity(medicine.id, left - 1); }}
+                  disabled={left <= 0}
+                  hitSlop={8}
+                  style={({ pressed }) => [styles.step, pressed && { opacity: 0.6 }, left <= 0 && { opacity: 0.3 }]}
+                  accessibilityLabel="One less"
+                >
+                  <Text style={styles.stepText}>−</Text>
+                </Pressable>
+
+                <View style={styles.stepValue}>
+                  <Text style={styles.stepNumber}>{left}</Text>
+                  <Text style={styles.stepUnit}>{packUnit(medicine.form)}</Text>
+                </View>
+
+                <Pressable
+                  onPress={() => { tap(); setQuantity(medicine.id, left + 1); }}
+                  hitSlop={8}
+                  style={({ pressed }) => [styles.step, pressed && { opacity: 0.6 }]}
+                  accessibilityLabel="One more"
+                >
+                  <Text style={styles.stepText}>+</Text>
+                </Pressable>
+              </View>
+              {left === 0 ? (
+                <Text style={[type.bodySoft, { fontSize: 13, marginTop: 10 }]}>
+                  Empty — worth replacing before you need it.
+                </Text>
+              ) : null}
+            </Card>
+          ) : null}
 
           <Card style={{ marginTop: 12 }}>
             <SectionLabel>How to take it</SectionLabel>
@@ -345,6 +382,17 @@ const styles = StyleSheet.create({
   redFlagText: { fontSize: 13, lineHeight: 18, color: '#A32226', fontWeight: '500' },
   profileNote: { fontSize: 12, color: colors.inkFaint, marginTop: 12 },
   profileLink: { fontSize: 12.5, color: colors.accent, marginTop: 12, fontWeight: '600' },
+  stepperRow: { flexDirection: 'row', alignItems: 'center', gap: 18, marginTop: 4 },
+  step: {
+    width: 44, height: 44, borderRadius: 22,
+    backgroundColor: alpha(colors.ink, 0.06),
+    alignItems: 'center', justifyContent: 'center',
+  },
+  stepText: { fontSize: 22, fontWeight: '600', color: colors.ink, marginTop: -2 },
+  stepValue: { flexDirection: 'row', alignItems: 'baseline', gap: 6 },
+  stepNumber: { fontSize: 30, fontWeight: '800', letterSpacing: -1, color: colors.ink },
+  stepUnit: { fontSize: 13, fontWeight: '600', color: colors.inkFaint },
+
   doneBtn: {
     alignSelf: 'flex-start', marginBottom: 16,
     paddingHorizontal: 18, paddingVertical: 10, borderRadius: 999,
