@@ -1,8 +1,9 @@
+import { BlurTargetView, BlurView } from 'expo-blur';
 import { Image } from 'expo-image';
 import React, { useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Medicine } from '../data/types';
-import { colors, font, glass } from '../theme';
+import { font, glass } from '../theme';
 import Vessel, { VESSEL_H, VESSEL_W } from './Vessel';
 
 const GAP = 4;
@@ -17,13 +18,70 @@ const PLATE_W = VESSEL_W;
 const PLATE_H = 56;
 const PLATE_TOP = VESSEL_H - OVERLAP;
 const LABEL_TOP = PLATE_TOP + PLATE_H + 14;
-const STAGE_H = LABEL_TOP + 34;
+const STAGE_H = LABEL_TOP + 36;
 const PAGE = (VESSEL_W + GAP) * 2;
 
 const PLATE = require('../../assets/shelf-plate.png');
 
 /** "Crocin Advance" on a shelf edge is just "Crocin". */
 const shelfLabel = (brand: string) => (brand.length > 12 ? brand.split(' ')[0] : brand);
+
+/**
+ * Figma sets the label at 16, sized for "Asprin". Indian brands run longer, so anything
+ * that would not fit beside the count steps down rather than truncating.
+ */
+const labelSize = (name: string) => (name.length > 8 ? 13 : 16);
+
+/**
+ * One container on its own glass plate.
+ *
+ * The plate is the Figma export — it carries the glass tint, edge and screws — but a PNG
+ * cannot frost what is behind it, so a BlurView sits underneath it and blurs the container.
+ * On Android that blur needs an explicit target, which is why each item wraps its own
+ * container in a BlurTargetView; iOS blurs whatever is behind and ignores the ref.
+ */
+function ShelfItem({
+  medicine, count, dimmed, onPress,
+}: {
+  medicine: Medicine;
+  count: number;
+  dimmed?: boolean;
+  onPress: () => void;
+}) {
+  const target = useRef<View>(null);
+
+  return (
+    <View style={styles.column}>
+      <BlurTargetView ref={target} style={styles.stand}>
+        <Vessel medicine={medicine} dimmed={dimmed} onPress={onPress} />
+      </BlurTargetView>
+
+      <View style={styles.plate} pointerEvents="none">
+        <BlurView
+          blurTarget={target}
+          intensity={Platform.OS === 'android' ? 60 : 24}
+          tint="light"
+          blurMethod="dimezisBlurViewSdk31Plus"
+          style={StyleSheet.absoluteFill}
+        />
+        <Image source={PLATE} style={StyleSheet.absoluteFill} contentFit="fill" />
+      </View>
+
+      {/* The label sits clear of the plate, the way a shelf edge label does. */}
+      <View style={styles.labelSlot}>
+        <Text
+          style={[styles.labelName, { fontSize: labelSize(shelfLabel(medicine.brand)) }]}
+          numberOfLines={1}
+        >
+          {shelfLabel(medicine.brand)}
+        </Text>
+        <View style={styles.labelPill}>
+          <Text style={styles.labelPillText}>{count}</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
 
 type Props = {
   title: string;
@@ -81,25 +139,13 @@ export default function GlassShelf({
           onLayout={(e) => setViewport(e.nativeEvent.layout.width)}
         >
           {medicines.map((m) => (
-            <View key={m.id} style={styles.column}>
-              <Vessel medicine={m} dimmed={dimmedIds?.includes(m.id)} onPress={() => onPressItem(m)} />
-
-              {/* The plate exported from Figma — glass effect and screws are baked in. */}
-              <Image
-                source={PLATE}
-                style={styles.plate}
-                contentFit="fill"
-                pointerEvents="none"
-              />
-
-              {/* The label sits clear of the plate, the way a shelf edge label does. */}
-              <View style={styles.labelSlot}>
-                <Text style={styles.labelName} numberOfLines={1}>{shelfLabel(m.brand)}</Text>
-                <View style={styles.labelPill}>
-                  <Text style={styles.labelPillText}>{counts[m.id] ?? 0}</Text>
-                </View>
-              </View>
-            </View>
+            <ShelfItem
+              key={m.id}
+              medicine={m}
+              count={counts[m.id] ?? 0}
+              dimmed={dimmedIds?.includes(m.id)}
+              onPress={() => onPressItem(m)}
+            />
           ))}
         </ScrollView>
       </View>
@@ -109,38 +155,46 @@ export default function GlassShelf({
   );
 }
 
+// Figma type values, all Instrument Sans at -1.5% tracking on #131927.
+const INK = '#131927';
+
 const styles = StyleSheet.create({
   wrap: { marginBottom: 6 },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: PAD, marginBottom: 10,
   },
-  title: { fontSize: 23, fontFamily: font.bold, letterSpacing: -0.7, color: colors.ink },
-  headerRight: { flexDirection: 'row', alignItems: 'center', gap: 14 },
-  count: { fontSize: 14, fontFamily: font.medium, color: glass.muted },
-  arrow: { fontSize: 30, lineHeight: 32, color: colors.ink, fontFamily: font.regular },
+  /** Figma: Medium 20. */
+  title: { fontSize: 20, fontFamily: font.medium, letterSpacing: -0.3, color: INK },
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  /** Figma: Regular 12. */
+  count: { fontSize: 12, fontFamily: font.regular, letterSpacing: -0.18, color: INK },
+  arrow: { fontSize: 26, lineHeight: 28, color: INK, fontFamily: font.regular },
   arrowOff: { color: glass.muted, opacity: 0.45 },
 
   stage: { height: STAGE_H },
   rail: { paddingHorizontal: PAD, gap: GAP, alignItems: 'flex-start' },
   column: { width: VESSEL_W, height: STAGE_H },
+  stand: { width: VESSEL_W, height: VESSEL_H },
+
+  plate: {
+    position: 'absolute', top: PLATE_TOP, left: 0,
+    width: PLATE_W, height: PLATE_H,
+    overflow: 'hidden',
+    borderRadius: 8,
+  },
 
   labelSlot: {
     position: 'absolute', top: LABEL_TOP, left: 0, right: 0,
     flexDirection: 'row', alignItems: 'center', gap: 7,
   },
-  labelName: { fontSize: 15, lineHeight: 19, fontFamily: font.regular, color: colors.ink, letterSpacing: -0.22, flexShrink: 1 },
+  /** Figma: Regular 16. */
+  labelName: { fontSize: 16, lineHeight: 20, fontFamily: font.regular, letterSpacing: -0.24, color: INK, flexShrink: 1 },
   labelPill: {
-    minWidth: 26, paddingHorizontal: 8, paddingVertical: 4,
-    borderRadius: 999, backgroundColor: 'rgba(11,11,15,0.06)', alignItems: 'center',
+    minWidth: 26, paddingHorizontal: 8, paddingVertical: 3,
+    borderRadius: 999, backgroundColor: 'rgba(19,25,39,0.06)', alignItems: 'center',
   },
-  labelPillText: { fontSize: 12, fontFamily: font.regular, color: 'rgba(19,25,39,0.5)' },
-
-  plate: {
-    position: 'absolute', top: PLATE_TOP, left: 0,
-    width: PLATE_W, height: PLATE_H,
-  },
-
+  labelPillText: { fontSize: 14, fontFamily: font.regular, letterSpacing: -0.21, color: 'rgba(19,25,39,0.55)' },
 
   rule: { height: 1, backgroundColor: glass.rule, marginHorizontal: PAD, marginTop: 18, marginBottom: 20 },
 });
