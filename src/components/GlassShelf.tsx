@@ -5,18 +5,20 @@ import { Medicine } from '../data/types';
 import { colors, font, glass, radius, type } from '../theme';
 import Vessel, { VESSEL_H, VESSEL_W } from './Vessel';
 
-const GAP = 10;
+const GAP = 4;
 const PAD = 20;
-/** How much of each container the glass plate covers. */
-const OVERLAP = 38;
-/** Figma: the plate is 115 x 56. */
+/**
+ * The container stands ON the plate rather than behind it — in the Figma frame it ends
+ * just past the plate's top edge, so only a sliver is hidden.
+ */
+const OVERLAP = 10;
+/** Figma: the plate is 115 x 56, one per container. */
+const PLATE_W = VESSEL_W;
 const PLATE_H = 56;
 const PLATE_TOP = VESSEL_H - OVERLAP;
-const LABEL_TOP = PLATE_TOP + PLATE_H + 12;
-const STAGE_H = LABEL_TOP + 40;
+const LABEL_TOP = PLATE_TOP + PLATE_H + 14;
+const STAGE_H = LABEL_TOP + 34;
 const PAGE = (VESSEL_W + GAP) * 2;
-/** Each container gets its own plate; they sit shoulder to shoulder with a hairline gap. */
-const PLATE_W = 115;
 
 /** "Crocin Advance" on a shelf edge is just "Crocin". */
 const shelfLabel = (brand: string) => (brand.length > 12 ? brand.split(' ')[0] : brand);
@@ -142,9 +144,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: PAD, marginBottom: 10,
   },
   title: { fontSize: 23, fontFamily: font.bold, letterSpacing: -0.7, color: colors.ink },
-  headerRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   count: { fontSize: 14, fontFamily: font.medium, color: glass.muted },
-  arrow: { fontSize: 23, lineHeight: 25, color: colors.ink, fontFamily: font.regular },
+  arrow: { fontSize: 30, lineHeight: 32, color: colors.ink, fontFamily: font.regular },
   arrowOff: { color: glass.muted, opacity: 0.45 },
 
   stage: { height: STAGE_H },
@@ -153,16 +155,16 @@ const styles = StyleSheet.create({
 
   labelSlot: {
     position: 'absolute', top: LABEL_TOP, left: 0, right: 0,
-    flexDirection: 'row', alignItems: 'center', gap: 5,
+    flexDirection: 'row', alignItems: 'center', gap: 7,
   },
-  labelName: { fontSize: 14, lineHeight: 18, fontFamily: font.medium, color: colors.ink, letterSpacing: -0.3, flexShrink: 1 },
+  labelName: { fontSize: 15, lineHeight: 19, fontFamily: font.regular, color: colors.ink, letterSpacing: -0.22, flexShrink: 1 },
   labelPill: {
-    minWidth: 20, paddingHorizontal: 5, paddingVertical: 1.5,
-    borderRadius: 999, backgroundColor: 'rgba(11,11,15,0.07)', alignItems: 'center',
+    minWidth: 26, paddingHorizontal: 8, paddingVertical: 4,
+    borderRadius: 999, backgroundColor: 'rgba(11,11,15,0.06)', alignItems: 'center',
   },
-  labelPillText: { fontSize: 10.5, fontFamily: font.semibold, color: glass.muted },
+  labelPillText: { fontSize: 12, fontFamily: font.regular, color: 'rgba(19,25,39,0.5)' },
 
-  plateLayer: { position: 'absolute', top: PLATE_TOP, left: -3, width: PLATE_W },
+  plateLayer: { position: 'absolute', top: PLATE_TOP, left: 0, width: PLATE_W },
   plate: {
     height: PLATE_H, borderRadius: 8,
     borderWidth: 1, borderColor: glass.plateEdge,
@@ -184,8 +186,8 @@ const styles = StyleSheet.create({
     width: 10, height: 10, borderRadius: 5,
     alignItems: 'center', justifyContent: 'center',
   },
-  screwSlotA: { position: 'absolute', width: 7, height: 1.3, backgroundColor: glass.screwSlot, borderRadius: 1 },
-  screwSlotB: { position: 'absolute', width: 1.3, height: 7, backgroundColor: glass.screwSlot, borderRadius: 1 },
+  screwSlotA: { position: 'absolute', width: 6.5, height: 1.6, backgroundColor: glass.screwSlot, borderRadius: 1 },
+  screwSlotB: { position: 'absolute', width: 1.6, height: 6.5, backgroundColor: glass.screwSlot, borderRadius: 1 },
 
   rule: { height: 1, backgroundColor: glass.rule, marginHorizontal: PAD, marginTop: 18, marginBottom: 20 },
 });

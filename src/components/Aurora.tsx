@@ -1,50 +1,37 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { glass } from '../theme';
 
 const clear = 'rgba(255,255,255,0)';
 
 /**
- * The iridescent wash behind the glass home screen. React Native has no blur filter
- * that behaves the same on both platforms, so the softness comes from stacking wide
- * colour-to-transparent gradients rather than blurring a mesh.
+ * The wash behind the glass home screen: white, with a cyan glow anchored top-right and
+ * a trace of lavender on the left. React Native has no blur filter that behaves the same
+ * on both platforms, so the softness comes from stacked colour-to-transparent gradients.
  */
 export default function Aurora() {
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
       <LinearGradient
-        colors={[glass.base, '#F2F8FB', '#F7FBFD']}
-        locations={[0, 0.45, 1]}
+        colors={['#FFFFFF', '#F6FBFD', '#F2F9FC']}
+        locations={[0, 0.5, 1]}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
         style={StyleSheet.absoluteFill}
       />
 
-      {/* Warm pink, anchored top-left. */}
       <LinearGradient
-        colors={['rgba(246,203,228,0.95)', 'rgba(246,203,228,0.35)', clear]}
-        locations={[0, 0.45, 1]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0.85, y: 1 }}
-        style={[styles.layer, { height: '44%' }]}
-      />
-
-      {/* Cool cyan, anchored top-right, crossing the pink. */}
-      <LinearGradient
-        colors={['rgba(176,231,244,0.95)', 'rgba(176,231,244,0.3)', clear]}
-        locations={[0, 0.5, 1]}
+        colors={['rgba(150, 226, 246, 0.9)', 'rgba(176, 234, 247, 0.34)', clear]}
+        locations={[0, 0.48, 1]}
         start={{ x: 1, y: 0 }}
-        end={{ x: 0.15, y: 1 }}
-        style={[styles.layer, { height: '40%' }]}
+        end={{ x: 0.08, y: 1 }}
+        style={[styles.layer, { height: '46%' }]}
       />
 
-      {/* A lilac seam where the two meet, which is what makes it read as iridescent. */}
       <LinearGradient
-        colors={[clear, 'rgba(214,209,248,0.5)', clear]}
-        locations={[0, 0.5, 1]}
-        start={{ x: 0.1, y: 0 }}
-        end={{ x: 0.95, y: 0.9 }}
+        colors={['rgba(219, 214, 246, 0.42)', clear]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0.75, y: 1 }}
         style={[styles.layer, { height: '30%' }]}
       />
     </View>

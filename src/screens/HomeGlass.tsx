@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   // Figma: 10px padding, 10px gap, 13px radius, Instrument Sans 14 at -1.5% tracking.
   tabPill: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
-    paddingHorizontal: 14, paddingVertical: 10, borderRadius: 13,
+    paddingHorizontal: 15, paddingVertical: 6, borderRadius: 13,
     backgroundColor: glass.tabIdle,
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.85)',
   },

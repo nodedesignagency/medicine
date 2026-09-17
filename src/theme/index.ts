@@ -7,12 +7,25 @@ export function alpha(hex: string, a: number) {
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
 }
 
-/** Mix a hex colour toward white (t > 0) or black (t < 0). Used for the 3D container shading. */
-export function shade(hex: string, t: number) {
-  const h = hex.replace('#', '');
+/** Parse "#RGB", "#RRGGBB" or "rgb(r, g, b)" into channels. */
+function channels(color: string): [number, number, number] {
+  const rgb = color.match(/rgba?\(([^)]+)\)/);
+  if (rgb) {
+    const [r, g, b] = rgb[1].split(',').map((v) => parseInt(v.trim(), 10));
+    return [r, g, b];
+  }
+  const h = color.replace('#', '');
   const n = parseInt(h.length === 3 ? h.split('').map((c) => c + c).join('') : h, 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+/**
+ * Mix a colour toward white (t > 0) or black (t < 0). Used for the 3D container shading.
+ * Accepts its own output as input, since shading is applied in layers.
+ */
+export function shade(color: string, t: number) {
   const mix = (c: number) => Math.round(t >= 0 ? c + (255 - c) * t : c * (1 + t));
-  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(mix);
+  const [r, g, b] = channels(color).map(mix);
   return `rgb(${r}, ${g}, ${b})`;
 }
 
@@ -109,14 +122,14 @@ export const glass = {
   washLilac: '#D9D6F8',
   washWarm: '#FDF0F5',
   // Figma: linear #E7E7E7 -> #DFDFDF at 60%, with a glass effect over it.
-  plateTop: 'rgba(231, 231, 231, 0.7)',
-  plate: 'rgba(225, 226, 229, 0.68)',
-  plateFoot: 'rgba(214, 217, 221, 0.74)',
+  plateTop: 'rgba(237, 238, 240, 0.97)',
+  plate: 'rgba(228, 230, 233, 0.95)',
+  plateFoot: 'rgba(214, 217, 222, 0.96)',
   plateEdge: 'rgba(255, 255, 255, 0.7)',
-  screwRim: '#6F7884',
-  screwLight: '#F7F9FB',
-  screwDark: '#8B95A1',
-  screwSlot: '#5E6771',
+  screwRim: '#767F8A',
+  screwLight: '#FDFDFE',
+  screwDark: '#AAB3BE',
+  screwSlot: '#69717B',
   /** Figma: active tab #131927, inactive #FFFFFF at 70%. */
   tabInk: '#131927',
   tabIdle: 'rgba(255, 255, 255, 0.7)',
