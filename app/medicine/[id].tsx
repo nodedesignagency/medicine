@@ -12,7 +12,7 @@ import { SymptomId } from '../../src/data/types';
 import { advise, PROFILE_OPTIONS, RED_FLAGS } from '../../src/logic/advisor';
 import { expiryLabel, expiryStatus, packUnit, quantityOf, useCabinet } from '../../src/store/cabinet';
 import { getPending } from '../../src/store/pending';
-import { alpha, colors, radius, shelfTints, type } from '../../src/theme';
+import { alpha, colors, font, radius, shelfTints, type } from '../../src/theme';
 
 const tap = () => {
   if (Platform.OS !== 'web') Haptics.selectionAsync().catch(() => {});
@@ -343,25 +343,25 @@ const styles = StyleSheet.create({
   salt: { fontSize: 13, color: colors.inkSoft, marginTop: 6, lineHeight: 18 },
   tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 12 },
   tag: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999, backgroundColor: alpha(colors.ink, 0.07) },
-  tagText: { fontSize: 11.5, fontWeight: '600', color: colors.inkSoft, textTransform: 'capitalize' },
+  tagText: { fontSize: 11.5, fontFamily: font.semibold, color: colors.inkSoft, textTransform: 'capitalize' },
 
   expiryRow: { flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 16 },
   expiryDot: { width: 7, height: 7, borderRadius: 4 },
-  expiryText: { fontSize: 12.5, fontWeight: '600', color: colors.inkSoft },
+  expiryText: { fontSize: 12.5, fontFamily: font.semibold, color: colors.inkSoft },
 
   body: { padding: 14 },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 7 },
   groupLabel: { ...type.micro, marginBottom: 7 },
 
   treatChip: { paddingHorizontal: 11, paddingVertical: 7, borderRadius: 999 },
-  treatText: { fontSize: 13, fontWeight: '600' },
+  treatText: { fontSize: 13, fontFamily: font.semibold },
   treatChipSoft: { paddingHorizontal: 11, paddingVertical: 7, borderRadius: 999, backgroundColor: alpha(colors.ink, 0.05) },
-  treatTextSoft: { fontSize: 13, fontWeight: '500', color: colors.inkFaint },
+  treatTextSoft: { fontSize: 13, fontFamily: font.medium, color: colors.inkFaint },
 
   doseGrid: { flexDirection: 'row', flexWrap: 'wrap' },
   doseCell: { width: '50%', paddingRight: 10, marginBottom: 14 },
   doseLabel: { ...type.micro, marginBottom: 4 },
-  doseValue: { fontSize: 14, fontWeight: '600', color: colors.ink, lineHeight: 19 },
+  doseValue: { fontSize: 14, fontFamily: font.semibold, color: colors.ink, lineHeight: 19 },
 
   avoidRow: { flexDirection: 'row', gap: 10, marginBottom: 10 },
   avoidDot: { width: 5, height: 5, borderRadius: 3, backgroundColor: colors.warn, marginTop: 8 },
@@ -373,30 +373,30 @@ const styles = StyleSheet.create({
   warnRow: { flexDirection: 'row', gap: 9, marginTop: 10, alignItems: 'flex-start' },
   warnMark: {
     width: 18, height: 18, borderRadius: 9, textAlign: 'center', lineHeight: 18,
-    backgroundColor: alpha(colors.warn, 0.18), color: '#9A6B00', fontSize: 11, fontWeight: '800',
+    backgroundColor: alpha(colors.warn, 0.18), color: '#9A6B00', fontSize: 11, fontFamily: font.bold,
   },
   redFlag: {
     marginTop: 12, padding: 11, borderRadius: radius.sm,
     backgroundColor: alpha(colors.bad, 0.08),
   },
-  redFlagText: { fontSize: 13, lineHeight: 18, color: '#A32226', fontWeight: '500' },
+  redFlagText: { fontSize: 13, lineHeight: 18, color: '#A32226', fontFamily: font.medium },
   profileNote: { fontSize: 12, color: colors.inkFaint, marginTop: 12 },
-  profileLink: { fontSize: 12.5, color: colors.accent, marginTop: 12, fontWeight: '600' },
+  profileLink: { fontSize: 12.5, color: colors.accent, marginTop: 12, fontFamily: font.semibold },
   stepperRow: { flexDirection: 'row', alignItems: 'center', gap: 18, marginTop: 4 },
   step: {
     width: 44, height: 44, borderRadius: 22,
     backgroundColor: alpha(colors.ink, 0.06),
     alignItems: 'center', justifyContent: 'center',
   },
-  stepText: { fontSize: 22, fontWeight: '600', color: colors.ink, marginTop: -2 },
+  stepText: { fontSize: 22, fontFamily: font.semibold, color: colors.ink, marginTop: -2 },
   stepValue: { flexDirection: 'row', alignItems: 'baseline', gap: 6 },
-  stepNumber: { fontSize: 30, fontWeight: '800', letterSpacing: -1, color: colors.ink },
-  stepUnit: { fontSize: 13, fontWeight: '600', color: colors.inkFaint },
+  stepNumber: { fontSize: 30, fontFamily: font.bold, letterSpacing: -1, color: colors.ink },
+  stepUnit: { fontSize: 13, fontFamily: font.semibold, color: colors.inkFaint },
 
   doneBtn: {
     alignSelf: 'flex-start', marginBottom: 16,
     paddingHorizontal: 18, paddingVertical: 10, borderRadius: 999,
     backgroundColor: colors.ink,
   },
-  doneText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
+  doneText: { color: '#FFFFFF', fontSize: 14, fontFamily: font.bold },
 });

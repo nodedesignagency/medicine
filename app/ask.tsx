@@ -11,7 +11,7 @@ import { SYMPTOMS, symptomLabel } from '../src/data/symptoms';
 import { SymptomId } from '../src/data/types';
 import { overlapWarnings, PROFILE_OPTIONS, ProfileKey, RED_FLAGS, suggestFrom } from '../src/logic/advisor';
 import { useCabinet } from '../src/store/cabinet';
-import { alpha, colors, radius, type } from '../src/theme';
+import { alpha, colors, font, radius, type } from '../src/theme';
 
 const tap = () => {
   if (Platform.OS !== 'web') Haptics.selectionAsync().catch(() => {});
@@ -157,7 +157,7 @@ export default function AskScreen() {
               <View key={medicine.id} style={styles.blockedRow}>
                 <VerdictBadge verdict="no" />
                 <Text style={styles.blockedText}>
-                  <Text style={{ fontWeight: '700' }}>{medicine.brand}</Text> would help, but {advice.warnings[0]?.toLowerCase()}
+                  <Text style={{ fontFamily: font.bold }}>{medicine.brand}</Text> would help, but {advice.warnings[0]?.toLowerCase()}
                 </Text>
               </View>
             ))}
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
   rowBody: { flex: 1, gap: 5 },
   rowName: { ...type.h2, marginTop: 2 },
   rowReason: { fontSize: 13.5, lineHeight: 19, color: colors.inkSoft },
-  rowWarn: { fontSize: 12.5, lineHeight: 17, fontWeight: '600', marginTop: 2 },
+  rowWarn: { fontSize: 12.5, lineHeight: 17, fontFamily: font.semibold, marginTop: 2 },
 
   blockedRow: {
     flexDirection: 'row', alignItems: 'flex-start', gap: 10,
@@ -257,13 +257,13 @@ const styles = StyleSheet.create({
     padding: 13, borderRadius: radius.md,
     backgroundColor: alpha(colors.warn, 0.12), marginBottom: 10,
   },
-  overlapText: { fontSize: 13, lineHeight: 18, color: '#7A5400', fontWeight: '500' },
+  overlapText: { fontSize: 13, lineHeight: 18, color: '#7A5400', fontFamily: font.medium },
 
   redFlag: {
     marginTop: 12, padding: 13, borderRadius: radius.md,
     backgroundColor: alpha(colors.bad, 0.08),
   },
-  redFlagText: { fontSize: 13, lineHeight: 18, color: '#A32226', fontWeight: '500' },
+  redFlagText: { fontSize: 13, lineHeight: 18, color: '#A32226', fontFamily: font.medium },
 
   hintBox: { paddingVertical: 40, paddingHorizontal: 30 },
   doneBtn: {
@@ -271,5 +271,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18, paddingVertical: 10, borderRadius: 999,
     backgroundColor: colors.ink,
   },
-  doneText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
+  doneText: { color: '#FFFFFF', fontSize: 14, fontFamily: font.bold },
 });

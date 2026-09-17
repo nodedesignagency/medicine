@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Medicine } from '../data/types';
-import { alpha, radius, shadow } from '../theme';
+import { alpha, font, radius, shadow } from '../theme';
 
 export const BOX_W = 98;
 export const BOX_H = 150;
@@ -127,17 +127,17 @@ const styles = StyleSheet.create({
   pressed: { transform: [{ translateY: 2 }, { scale: 0.985 }] },
   dimmed: { opacity: 0.42 },
   boxInner: { flex: 1, justifyContent: 'space-between' },
-  maker: { fontWeight: '700', letterSpacing: 0.7, textTransform: 'uppercase' },
-  brand: { fontWeight: '800', letterSpacing: -0.6, marginTop: 4 },
+  maker: { fontFamily: font.bold, letterSpacing: 0.7, textTransform: 'uppercase' },
+  brand: { fontFamily: font.bold, letterSpacing: -0.6, marginTop: 4 },
   boxFoot: { marginTop: 'auto' },
-  salt: { fontWeight: '600', letterSpacing: 0.4, textTransform: 'uppercase' },
+  salt: { fontFamily: font.semibold, letterSpacing: 0.4, textTransform: 'uppercase' },
 
   rx: {
     position: 'absolute', top: 7, right: 7,
     width: 15, height: 15, borderRadius: 8, borderWidth: 1,
     alignItems: 'center', justifyContent: 'center',
   },
-  rxText: { fontSize: 9, fontWeight: '800' },
+  rxText: { fontSize: 9, fontFamily: font.bold },
 
   fillX: { position: 'absolute', left: 0, right: 0 },
   stripe: { position: 'absolute', transform: [{ rotate: '-32deg' }] },

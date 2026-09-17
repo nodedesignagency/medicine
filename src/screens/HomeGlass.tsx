@@ -9,7 +9,7 @@ import HeroSentence from '../components/HeroSentence';
 import { CATEGORIES } from '../data/medicines';
 import { CategoryId, Medicine } from '../data/types';
 import { expiryStatus, quantityOf, useCabinet } from '../store/cabinet';
-import { colors, glass, type } from '../theme';
+import { colors, font, glass, type } from '../theme';
 
 /** Tab pill: label, a hairline rule, then the count — active inverts to black. */
 function TabPill({
@@ -127,19 +127,20 @@ const styles = StyleSheet.create({
   hero: { paddingHorizontal: 20, paddingBottom: 26 },
   tabs: { paddingHorizontal: 20, gap: 8, paddingBottom: 26 },
 
+  // Figma: 10px padding, 10px gap, 13px radius, Instrument Sans 14 at -1.5% tracking.
   tabPill: {
-    flexDirection: 'row', alignItems: 'center', gap: 9,
-    paddingHorizontal: 16, paddingVertical: 11, borderRadius: 999,
-    backgroundColor: glass.chipIdle,
-    borderWidth: 1, borderColor: glass.chipEdge,
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    paddingHorizontal: 14, paddingVertical: 10, borderRadius: 13,
+    backgroundColor: glass.tabIdle,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.85)',
   },
-  tabPillOn: { backgroundColor: '#12151C', borderColor: '#12151C' },
-  tabLabel: { fontSize: 15, fontWeight: '500', color: colors.ink, letterSpacing: -0.2 },
+  tabPillOn: { backgroundColor: glass.tabInk, borderColor: glass.tabInk },
+  tabLabel: { fontSize: 14, fontFamily: font.regular, color: glass.tabInk, letterSpacing: -0.21 },
   tabLabelOn: { color: '#FFFFFF' },
-  tabRule: { width: 1, height: 13, backgroundColor: 'rgba(11,11,15,0.16)' },
-  tabRuleOn: { backgroundColor: 'rgba(255,255,255,0.3)' },
-  tabCount: { fontSize: 14, fontWeight: '500', color: glass.muted },
-  tabCountOn: { color: 'rgba(255,255,255,0.72)' },
+  tabRule: { width: 1, height: 12, backgroundColor: 'rgba(19,25,39,0.22)' },
+  tabRuleOn: { backgroundColor: 'rgba(255,255,255,0.32)' },
+  tabCount: { fontSize: 14, fontFamily: font.regular, color: 'rgba(19,25,39,0.45)', letterSpacing: -0.21 },
+  tabCountOn: { color: 'rgba(255,255,255,0.7)' },
 
   empty: { alignItems: 'center', paddingVertical: 60, paddingHorizontal: 40 },
 });

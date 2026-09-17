@@ -10,7 +10,7 @@ import { Chip } from '../components/ui';
 import { CATEGORIES } from '../data/medicines';
 import { CategoryId, Medicine } from '../data/types';
 import { expiryStatus, useCabinet } from '../store/cabinet';
-import { alpha, colors, radius, shadow, shelfTints, type } from '../theme';
+import { alpha, colors, font, radius, shadow, shelfTints, type } from '../theme';
 
 export default function HomeShelf() {
   const router = useRouter();
@@ -203,9 +203,9 @@ const styles = StyleSheet.create({
     backgroundColor: alpha(colors.ink, 0.82),
     alignItems: 'center', justifyContent: 'center',
   },
-  statusBadgeText: { color: '#FFFFFF', fontSize: 15, fontWeight: '800' },
+  statusBadgeText: { color: '#FFFFFF', fontSize: 15, fontFamily: font.bold },
   statusCopy: { flex: 1 },
-  statusTitle: { fontSize: 14.5, fontWeight: '700', color: colors.ink, letterSpacing: -0.3 },
+  statusTitle: { fontSize: 14.5, fontFamily: font.bold, color: colors.ink, letterSpacing: -0.3 },
   statusSub: { fontSize: 12.5, color: alpha(colors.ink, 0.5), marginTop: 1 },
   dots: { flexDirection: 'row', gap: 4, padding: 4 },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: alpha(colors.ink, 0.22) },
@@ -232,12 +232,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 11, paddingVertical: 6, borderRadius: 999,
     backgroundColor: alpha(colors.ink, 0.05),
   },
-  askChipText: { fontSize: 11.5, fontWeight: '600', color: colors.inkSoft },
+  askChipText: { fontSize: 11.5, fontFamily: font.semibold, color: colors.inkSoft },
   askTitle: { ...type.displaySm, marginTop: 14 },
   askSub: { fontSize: 13, lineHeight: 18, color: colors.inkFaint, marginTop: 8 },
   askNumber: { flexDirection: 'row', alignItems: 'flex-end', gap: 8, marginTop: 18 },
-  askBig: { fontSize: 54, lineHeight: 56, fontWeight: '800', letterSpacing: -3, color: colors.ink },
-  askBigLabel: { fontSize: 11, lineHeight: 13, color: colors.inkFaint, fontWeight: '600', paddingBottom: 8 },
+  askBig: { fontSize: 54, lineHeight: 56, fontFamily: font.bold, letterSpacing: -3, color: colors.ink },
+  askBigLabel: { fontSize: 11, lineHeight: 13, color: colors.inkFaint, fontFamily: font.semibold, paddingBottom: 8 },
 
   askGrid: { width: 142, flexDirection: 'row', flexWrap: 'wrap', gap: 6, alignContent: 'flex-start' },
 
@@ -251,11 +251,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.ink,
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
   },
-  scanBtnText: { color: '#FFFFFF', fontSize: 15.5, fontWeight: '700', letterSpacing: -0.3 },
+  scanBtnText: { color: '#FFFFFF', fontSize: 15.5, fontFamily: font.bold, letterSpacing: -0.3 },
   askBtn: {
     width: 56, height: 56, borderRadius: 999,
     backgroundColor: colors.card,
     alignItems: 'center', justifyContent: 'center',
   },
-  askBtnText: { fontSize: 20, fontWeight: '800', color: colors.ink },
+  askBtnText: { fontSize: 20, fontFamily: font.bold, color: colors.ink },
 });

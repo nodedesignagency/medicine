@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Medicine } from '../data/types';
-import { alpha, colors, radius, shadow, type } from '../theme';
+import { alpha, colors, font, radius, shadow, type } from '../theme';
 import MedicineBox, { BOX_H, BOX_W } from './MedicineBox';
 
 const GAP = 11;
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
   headerRight: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   count: { ...type.label, color: colors.inkFaint },
   arrows: { flexDirection: 'row', gap: 12 },
-  arrow: { fontSize: 22, lineHeight: 24, color: colors.inkSoft, fontWeight: '500' },
+  arrow: { fontSize: 22, lineHeight: 24, color: colors.inkSoft, fontFamily: font.medium },
   arrowOff: { color: colors.inkFaint, opacity: 0.4 },
 
   stage: { height: BOX_H + DROP },
@@ -182,6 +182,6 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
     gap: 2,
   },
-  ghostPlus: { fontSize: 24, fontWeight: '300', color: colors.inkFaint, marginTop: -6 },
+  ghostPlus: { fontSize: 24, fontFamily: font.regular, color: colors.inkFaint, marginTop: -6 },
   ghostLabel: { ...type.micro, color: colors.inkFaint },
 });

@@ -2,20 +2,21 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Medicine } from '../data/types';
-import { colors, glass, radius, type } from '../theme';
+import { colors, font, glass, radius, type } from '../theme';
 import Vessel, { VESSEL_H, VESSEL_W } from './Vessel';
 
 const GAP = 10;
 const PAD = 20;
 /** How much of each container the glass plate covers. */
 const OVERLAP = 38;
-const PLATE_H = 52;
+/** Figma: the plate is 115 x 56. */
+const PLATE_H = 56;
 const PLATE_TOP = VESSEL_H - OVERLAP;
 const LABEL_TOP = PLATE_TOP + PLATE_H + 12;
 const STAGE_H = LABEL_TOP + 40;
 const PAGE = (VESSEL_W + GAP) * 2;
 /** Each container gets its own plate; they sit shoulder to shoulder with a hairline gap. */
-const PLATE_W = VESSEL_W + 6;
+const PLATE_W = 115;
 
 /** "Crocin Advance" on a shelf edge is just "Crocin". */
 const shelfLabel = (brand: string) => (brand.length > 12 ? brand.split(' ')[0] : brand);
@@ -26,12 +27,19 @@ function Screw({ x, y }: { x: 'l' | 'r'; y: 't' | 'b' }) {
     <View
       style={[
         styles.screw,
-        x === 'l' ? { left: 7 } : { right: 7 },
-        y === 't' ? { top: 7 } : { bottom: 7 },
+        x === 'l' ? { left: 3 } : { right: 3 },
+        y === 't' ? { top: 3 } : { bottom: 3 },
       ]}
     >
-      <View style={styles.screwSlotA} />
-      <View style={styles.screwSlotB} />
+      <LinearGradient
+        colors={[glass.screwLight, glass.screwDark]}
+        start={{ x: 0.15, y: 0 }}
+        end={{ x: 0.85, y: 1 }}
+        style={styles.screwFace}
+      >
+        <View style={styles.screwSlotA} />
+        <View style={styles.screwSlotB} />
+      </LinearGradient>
     </View>
   );
 }
@@ -133,10 +141,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: PAD, marginBottom: 10,
   },
-  title: { fontSize: 23, fontWeight: '700', letterSpacing: -0.7, color: colors.ink },
+  title: { fontSize: 23, fontFamily: font.bold, letterSpacing: -0.7, color: colors.ink },
   headerRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  count: { fontSize: 14, fontWeight: '500', color: glass.muted },
-  arrow: { fontSize: 23, lineHeight: 25, color: colors.ink, fontWeight: '400' },
+  count: { fontSize: 14, fontFamily: font.medium, color: glass.muted },
+  arrow: { fontSize: 23, lineHeight: 25, color: colors.ink, fontFamily: font.regular },
   arrowOff: { color: glass.muted, opacity: 0.45 },
 
   stage: { height: STAGE_H },
@@ -147,16 +155,16 @@ const styles = StyleSheet.create({
     position: 'absolute', top: LABEL_TOP, left: 0, right: 0,
     flexDirection: 'row', alignItems: 'center', gap: 5,
   },
-  labelName: { fontSize: 14, lineHeight: 18, fontWeight: '500', color: colors.ink, letterSpacing: -0.3, flexShrink: 1 },
+  labelName: { fontSize: 14, lineHeight: 18, fontFamily: font.medium, color: colors.ink, letterSpacing: -0.3, flexShrink: 1 },
   labelPill: {
     minWidth: 20, paddingHorizontal: 5, paddingVertical: 1.5,
     borderRadius: 999, backgroundColor: 'rgba(11,11,15,0.07)', alignItems: 'center',
   },
-  labelPillText: { fontSize: 10.5, fontWeight: '600', color: glass.muted },
+  labelPillText: { fontSize: 10.5, fontFamily: font.semibold, color: glass.muted },
 
   plateLayer: { position: 'absolute', top: PLATE_TOP, left: -3, width: PLATE_W },
   plate: {
-    height: PLATE_H, borderRadius: 7,
+    height: PLATE_H, borderRadius: 8,
     borderWidth: 1, borderColor: glass.plateEdge,
     overflow: 'hidden',
     shadowColor: '#3A4A6B', shadowOpacity: 0.1, shadowRadius: 12,
@@ -168,13 +176,16 @@ const styles = StyleSheet.create({
   },
 
   screw: {
-    position: 'absolute', width: 11, height: 11, borderRadius: 6,
-    backgroundColor: glass.screw,
-    borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.9)',
+    position: 'absolute', width: 12, height: 12, borderRadius: 6,
+    backgroundColor: glass.screwRim,
     alignItems: 'center', justifyContent: 'center',
   },
-  screwSlotA: { position: 'absolute', width: 6, height: 1.2, backgroundColor: glass.screwSlot, borderRadius: 1 },
-  screwSlotB: { position: 'absolute', width: 1.2, height: 6, backgroundColor: glass.screwSlot, borderRadius: 1 },
+  screwFace: {
+    width: 10, height: 10, borderRadius: 5,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  screwSlotA: { position: 'absolute', width: 7, height: 1.3, backgroundColor: glass.screwSlot, borderRadius: 1 },
+  screwSlotB: { position: 'absolute', width: 1.3, height: 7, backgroundColor: glass.screwSlot, borderRadius: 1 },
 
   rule: { height: 1, backgroundColor: glass.rule, marginHorizontal: PAD, marginTop: 18, marginBottom: 20 },
 });

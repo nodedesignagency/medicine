@@ -15,7 +15,7 @@ import { Medicine } from '../src/data/types';
 import { recognizeMedicine, searchMedicines } from '../src/logic/ai';
 import { useCabinet } from '../src/store/cabinet';
 import { rememberPending } from '../src/store/pending';
-import { alpha, colors, radius, shadow, type } from '../src/theme';
+import { alpha, colors, font, radius, shadow, type } from '../src/theme';
 
 const FRAME_H = 250;
 /** Shown in the picker before the user types anything. */
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
 
   scrim: { flex: 1, backgroundColor: 'rgba(8,8,14,0.42)', justifyContent: 'space-between' },
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingBottom: 10 },
-  topTitle: { color: '#FFFFFF', fontSize: 15, fontWeight: '700', letterSpacing: -0.2 },
+  topTitle: { color: '#FFFFFF', fontSize: 15, fontFamily: font.bold, letterSpacing: -0.2 },
   round: {
     width: 38, height: 38, borderRadius: 19,
     backgroundColor: 'rgba(255,255,255,0.16)',
@@ -263,24 +263,24 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.85)',
     shadowColor: '#FFFFFF', shadowOpacity: 0.9, shadowRadius: 8, shadowOffset: { width: 0, height: 0 },
   },
-  hint: { color: 'rgba(255,255,255,0.72)', fontSize: 13, marginTop: 16, fontWeight: '500' },
+  hint: { color: 'rgba(255,255,255,0.72)', fontSize: 13, marginTop: 16, fontFamily: font.medium },
 
   bottom: { alignItems: 'center', gap: 16, paddingTop: 10 },
-  typeLink: { color: 'rgba(255,255,255,0.8)', fontSize: 13.5, fontWeight: '600', textDecorationLine: 'underline' },
+  typeLink: { color: 'rgba(255,255,255,0.8)', fontSize: 13.5, fontFamily: font.semibold, textDecorationLine: 'underline' },
   shutter: {
     width: 74, height: 74, borderRadius: 37,
     borderWidth: 3, borderColor: 'rgba(255,255,255,0.9)',
     alignItems: 'center', justifyContent: 'center',
   },
   shutterInner: { width: 58, height: 58, borderRadius: 29, backgroundColor: '#FFFFFF' },
-  mode: { color: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase' },
+  mode: { color: 'rgba(255,255,255,0.5)', fontSize: 11, fontFamily: font.bold, letterSpacing: 0.8, textTransform: 'uppercase' },
 
   reading: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: 'rgba(8,8,14,0.82)',
     alignItems: 'center', justifyContent: 'center', padding: 40, gap: 14,
   },
-  readingText: { color: '#FFFFFF', fontSize: 15, fontWeight: '600', textAlign: 'center', lineHeight: 21 },
+  readingText: { color: '#FFFFFF', fontSize: 15, fontFamily: font.semibold, textAlign: 'center', lineHeight: 21 },
 
   sheetWrap: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,

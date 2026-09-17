@@ -6,7 +6,7 @@ import { CloseIcon } from '../src/components/Icons';
 import { Button, Card, Chip, Disclaimer, SectionLabel } from '../src/components/ui';
 import { PROFILE_OPTIONS, ProfileKey } from '../src/logic/advisor';
 import { HomeStyle, useCabinet } from '../src/store/cabinet';
-import { alpha, colors, radius, type } from '../src/theme';
+import { alpha, colors, font, radius, type } from '../src/theme';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14, justifyContent: 'center',
   },
   keyInput: { fontSize: 15, color: colors.ink, padding: 0 },
-  link: { fontSize: 13, color: colors.accent, fontWeight: '600', marginTop: 14 },
+  link: { fontSize: 13, color: colors.accent, fontFamily: font.semibold, marginTop: 14 },
   warnBox: { marginTop: 14, padding: 12, borderRadius: radius.sm, backgroundColor: alpha(colors.warn, 0.1) },
   warnText: { fontSize: 12, lineHeight: 17, color: '#7A5400' },
   footer: { fontSize: 11.5, lineHeight: 17, color: colors.inkFaint, textAlign: 'center', marginTop: 24 },

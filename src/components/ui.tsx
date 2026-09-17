@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { Verdict } from '../logic/advisor';
-import { alpha, colors, radius, shadow, type } from '../theme';
+import { alpha, colors, font, radius, shadow, type } from '../theme';
 
 export function Chip({
   label, active, onPress, count, tone,
@@ -124,13 +124,13 @@ const styles = StyleSheet.create({
     backgroundColor: alpha(colors.ink, 0.045),
     borderWidth: 1, borderColor: 'transparent',
   },
-  chipText: { fontSize: 14, fontWeight: '600', color: colors.inkSoft, letterSpacing: -0.2 },
+  chipText: { fontSize: 14, fontFamily: font.semibold, color: colors.inkSoft, letterSpacing: -0.2 },
   chipCount: {
     minWidth: 20, paddingHorizontal: 5, paddingVertical: 1,
     borderRadius: 999, backgroundColor: alpha(colors.ink, 0.07),
     alignItems: 'center',
   },
-  chipCountText: { fontSize: 11, fontWeight: '700', color: colors.inkFaint },
+  chipCountText: { fontSize: 11, fontFamily: font.bold, color: colors.inkFaint },
 
   card: { backgroundColor: colors.card, borderRadius: radius.lg, padding: 18 },
   sectionLabel: { ...type.micro, textTransform: 'uppercase', marginBottom: 8 },
@@ -140,8 +140,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 9, paddingVertical: 5, borderRadius: 999,
     alignSelf: 'flex-start',
   },
-  badgeMark: { fontSize: 12, fontWeight: '800' },
-  badgeText: { fontSize: 12, fontWeight: '700', letterSpacing: -0.1 },
+  badgeMark: { fontSize: 12, fontFamily: font.bold },
+  badgeText: { fontSize: 12, fontFamily: font.bold, letterSpacing: -0.1 },
 
   disclaimer: {
     backgroundColor: alpha(colors.ink, 0.04),
@@ -161,5 +161,5 @@ const styles = StyleSheet.create({
   btnPrimary: { backgroundColor: colors.ink },
   btnGhost: { backgroundColor: alpha(colors.ink, 0.06) },
   btnDanger: { backgroundColor: alpha(colors.bad, 0.1) },
-  btnText: { fontSize: 15, fontWeight: '700', letterSpacing: -0.2 },
+  btnText: { fontSize: 15, fontFamily: font.bold, letterSpacing: -0.2 },
 });

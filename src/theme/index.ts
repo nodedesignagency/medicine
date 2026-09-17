@@ -1,4 +1,4 @@
-import { Platform, TextStyle } from 'react-native';
+import { TextStyle } from 'react-native';
 
 /** Turn "#RRGGBB" into an rgba() string. Used everywhere for the acrylic shelves. */
 export function alpha(hex: string, a: number) {
@@ -33,52 +33,55 @@ export const colors = {
 };
 
 /**
- * The reference art uses a tight, heavy grotesque. SF Pro Display Heavy (iOS) and
- * Roboto Black (Android) are the closest thing available without shipping webfonts,
- * so weight + negative tracking do the work instead of a custom family.
+ * Instrument Sans and Instrument Serif, matching the Figma file. Custom fonts do not
+ * synthesise weights in React Native — each weight is its own family name, so styles
+ * set `fontFamily` rather than `fontWeight`. Instrument Sans ships 400–700, so the
+ * old 800 display weight maps to Bold.
  */
-const sans = Platform.select({ ios: undefined, default: undefined });
-const serif = Platform.select({ ios: 'Georgia', android: 'serif', default: 'serif' });
+export const font = {
+  regular: 'InstrumentSans_400Regular',
+  medium: 'InstrumentSans_500Medium',
+  semibold: 'InstrumentSans_600SemiBold',
+  bold: 'InstrumentSans_700Bold',
+  serif: 'InstrumentSerif_400Regular',
+} as const;
 
 export const type = {
   /** The oversized editorial headline from the reference. */
   display: {
-    fontFamily: sans,
     fontSize: 44,
     lineHeight: 46,
-    fontWeight: '800',
+    fontFamily: font.bold,
     letterSpacing: -1.8,
     color: colors.ink,
   } as TextStyle,
   displaySm: {
-    fontFamily: sans,
     fontSize: 32,
     lineHeight: 35,
-    fontWeight: '800',
+    fontFamily: font.bold,
     letterSpacing: -1.2,
     color: colors.ink,
   } as TextStyle,
   /** The editorial serif sentence that heads the glass home screen. */
   serifDisplay: {
-    fontFamily: serif,
-    fontSize: 33,
-    lineHeight: 43,
-    fontWeight: '400',
+    fontSize: 38,
+    lineHeight: 46,
+    fontFamily: font.serif,
     letterSpacing: -0.2,
     color: colors.ink,
   } as TextStyle,
   serifMark: {
-    fontFamily: serif,
+    fontFamily: font.serif,
     fontSize: 26,
     letterSpacing: 0.5,
     color: colors.ink,
   } as TextStyle,
-  h1: { fontSize: 22, fontWeight: '700', letterSpacing: -0.6, color: colors.ink } as TextStyle,
-  h2: { fontSize: 17, fontWeight: '700', letterSpacing: -0.3, color: colors.ink } as TextStyle,
-  body: { fontSize: 15, lineHeight: 22, fontWeight: '400', color: colors.ink } as TextStyle,
-  bodySoft: { fontSize: 15, lineHeight: 22, fontWeight: '400', color: colors.inkSoft } as TextStyle,
-  label: { fontSize: 13, fontWeight: '600', letterSpacing: -0.1, color: colors.inkSoft } as TextStyle,
-  micro: { fontSize: 10, fontWeight: '700', letterSpacing: 0.8, color: colors.inkFaint } as TextStyle,
+  h1: { fontSize: 22, fontFamily: font.bold, letterSpacing: -0.6, color: colors.ink } as TextStyle,
+  h2: { fontSize: 17, fontFamily: font.bold, letterSpacing: -0.3, color: colors.ink } as TextStyle,
+  body: { fontSize: 15, lineHeight: 22, fontFamily: font.regular, color: colors.ink } as TextStyle,
+  bodySoft: { fontSize: 15, lineHeight: 22, fontFamily: font.regular, color: colors.inkSoft } as TextStyle,
+  label: { fontSize: 13, fontFamily: font.semibold, letterSpacing: -0.1, color: colors.inkSoft } as TextStyle,
+  micro: { fontSize: 10, fontFamily: font.bold, letterSpacing: 0.8, color: colors.inkFaint } as TextStyle,
 };
 
 export const radius = { sm: 8, md: 14, lg: 22, xl: 30 };
@@ -105,12 +108,18 @@ export const glass = {
   washCyan: '#BCE8F3',
   washLilac: '#D9D6F8',
   washWarm: '#FDF0F5',
-  plate: 'rgba(255, 255, 255, 0.3)',
-  plateTop: 'rgba(255, 255, 255, 0.22)',
-  plateFoot: 'rgba(255, 255, 255, 0.46)',
-  plateEdge: 'rgba(255, 255, 255, 0.75)',
-  screw: '#A7B0BB',
-  screwSlot: '#636C77',
+  // Figma: linear #E7E7E7 -> #DFDFDF at 60%, with a glass effect over it.
+  plateTop: 'rgba(231, 231, 231, 0.7)',
+  plate: 'rgba(225, 226, 229, 0.68)',
+  plateFoot: 'rgba(214, 217, 221, 0.74)',
+  plateEdge: 'rgba(255, 255, 255, 0.7)',
+  screwRim: '#6F7884',
+  screwLight: '#F7F9FB',
+  screwDark: '#8B95A1',
+  screwSlot: '#5E6771',
+  /** Figma: active tab #131927, inactive #FFFFFF at 70%. */
+  tabInk: '#131927',
+  tabIdle: 'rgba(255, 255, 255, 0.7)',
   rule: 'rgba(11, 11, 15, 0.08)',
   chipIdle: 'rgba(255, 255, 255, 0.62)',
   chipEdge: 'rgba(255, 255, 255, 0.9)',

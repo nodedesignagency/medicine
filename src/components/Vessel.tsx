@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Form, Medicine } from '../data/types';
-import { alpha, shade } from '../theme';
+import { alpha, font, shade } from '../theme';
 
 /** Perceived brightness, 0–1. */
 function luminance(hex: string) {
@@ -11,8 +11,8 @@ function luminance(hex: string) {
   return (0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
 }
 
-export const VESSEL_W = 108;
-export const VESSEL_H = 138;
+export const VESSEL_W = 109;
+export const VESSEL_H = 134;
 
 type Shape = 'jar' | 'bottle' | 'tube' | 'packet' | 'spray';
 
@@ -72,38 +72,51 @@ function Body({
 }
 
 function Cap({
-  color, w, h, radius = 5, topRadius,
+  color, w, h, radius = 5, lid,
 }: {
-  color: string; w: number; h: number; radius?: number; topRadius?: number;
+  color: string; w: number; h: number; radius?: number; lid?: boolean;
 }) {
-  const top = topRadius ?? radius;
+  const ellipse = w * 0.1;
   return (
-    <LinearGradient
-      colors={[shade(color, 0.2), shade(color, -0.16), shade(color, -0.34)]}
-      locations={[0, 0.5, 1]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 0 }}
-      style={{
-        width: w,
-        height: h,
-        borderTopLeftRadius: top,
-        borderTopRightRadius: top,
-        borderBottomLeftRadius: radius,
-        borderBottomRightRadius: radius,
-        overflow: 'hidden',
-      }}
-    >
-      <View style={{ height: Math.max(1, h * 0.12), backgroundColor: 'rgba(255,255,255,0.28)' }} />
-    </LinearGradient>
+    <View style={{ width: w, height: h }}>
+      <LinearGradient
+        colors={[shade(color, 0.2), shade(color, -0.16), shade(color, -0.34)]}
+        locations={[0, 0.5, 1]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={{
+          width: w,
+          height: h,
+          borderTopLeftRadius: lid ? w * 0.24 : radius,
+          borderTopRightRadius: lid ? w * 0.24 : radius,
+          borderBottomLeftRadius: radius,
+          borderBottomRightRadius: radius,
+          overflow: 'hidden',
+        }}
+      />
+      {lid ? (
+        // The lit top face of the cylinder.
+        <LinearGradient
+          colors={[shade(color, 0.34), shade(color, 0.04)]}
+          start={{ x: 0.1, y: 0 }}
+          end={{ x: 0.9, y: 1 }}
+          style={{
+            position: 'absolute', top: 0, left: 0,
+            width: w, height: ellipse * 2,
+            borderRadius: ellipse,
+          }}
+        />
+      ) : null}
+    </View>
   );
 }
 
 /** Brand lockup printed on the container, small enough to read as packaging. */
 function Print({ m, w, tight }: { m: Medicine; w: number; tight?: boolean }) {
   const ink = m.ink;
-  const size = m.brand.length > 13 ? 10 : m.brand.length > 9 ? 11.5 : 13;
+  const size = m.brand.length > 13 ? 9 : m.brand.length > 9 ? 10 : 11.5;
   return (
-    <View style={[styles.print, { width: w, paddingHorizontal: w * 0.11 }]}>
+    <View style={[styles.print, { width: w, paddingHorizontal: w * 0.1 }]}>
       <Text style={[styles.maker, { color: alpha(ink, 0.6) }]} numberOfLines={1}>
         {m.maker}
       </Text>
@@ -144,43 +157,43 @@ export default function Vessel({ medicine, onPress, dimmed, width = VESSEL_W, he
     >
       {shape === 'jar' ? (
         <>
-          <Cap color={c} w={width * 0.9} h={height * 0.25} radius={2} topRadius={9} />
-          <Body color={c} w={width * 0.84} h={height * 0.76} radius={8} topRadius={2}>
-            <View style={{ height: height * 0.08 }} />
-            <Print m={medicine} w={width * 0.84} />
+          <Cap color={c} w={width * 0.68} h={height * 0.26} radius={3} lid />
+          <Body color={c} w={width * 0.63} h={height * 0.74} radius={7} topRadius={2}>
+            <View style={{ height: height * 0.05 }} />
+            <Print m={medicine} w={width * 0.63} />
           </Body>
         </>
       ) : null}
 
       {shape === 'bottle' ? (
         <>
-          <Cap color={c} w={width * 0.34} h={height * 0.11} radius={3} />
-          <View style={{ width: width * 0.27, height: height * 0.07, backgroundColor: shade(c, -0.08) }} />
-          <Body color={c} w={width * 0.84} h={height * 0.8} radius={11}>
+          <Cap color={c} w={width * 0.3} h={height * 0.11} radius={3} lid />
+          <View style={{ width: width * 0.22, height: height * 0.07, backgroundColor: shade(c, -0.08) }} />
+          <Body color={c} w={width * 0.64} h={height * 0.8} radius={10}>
             <View style={{ height: height * 0.09 }} />
-            <Print m={medicine} w={width * 0.84} />
+            <Print m={medicine} w={width * 0.64} />
           </Body>
         </>
       ) : null}
 
       {shape === 'tube' ? (
         <>
-          <Cap color={c} w={width * 0.3} h={height * 0.1} radius={3} />
-          <Body color={c} w={width * 0.72} h={height * 0.86} radius={4}>
+          <Cap color={c} w={width * 0.26} h={height * 0.1} radius={3} lid />
+          <Body color={c} w={width * 0.58} h={height * 0.86} radius={4}>
             {/* The crimped seal at the top of every ointment tube. */}
             <View style={{ height: height * 0.05, backgroundColor: shade(c, -0.26) }} />
             <View style={{ height: height * 0.06 }} />
-            <Print m={medicine} w={width * 0.72} />
+            <Print m={medicine} w={width * 0.58} />
           </Body>
         </>
       ) : null}
 
       {shape === 'packet' ? (
         <View style={{ marginTop: height * 0.08 }}>
-          <Body color={c} w={width * 0.9} h={height * 0.9} radius={4}>
+          <Body color={c} w={width * 0.68} h={height * 0.9} radius={4}>
             <View style={{ height: height * 0.06, backgroundColor: shade(c, -0.22) }} />
             <View style={{ height: height * 0.07 }} />
-            <Print m={medicine} w={width * 0.9} />
+            <Print m={medicine} w={width * 0.68} />
             <View style={styles.packetFoot}>
               <View style={{ height: height * 0.05, backgroundColor: shade(c, -0.22) }} />
             </View>
@@ -190,11 +203,11 @@ export default function Vessel({ medicine, onPress, dimmed, width = VESSEL_W, he
 
       {shape === 'spray' ? (
         <>
-          <Cap color={c} w={width * 0.2} h={height * 0.08} radius={2} />
-          <Cap color={c} w={width * 0.42} h={height * 0.06} radius={2} />
-          <Body color={c} w={width * 0.68} h={height * 0.82} radius={7}>
+          <Cap color={c} w={width * 0.16} h={height * 0.08} radius={2} />
+          <Cap color={c} w={width * 0.34} h={height * 0.06} radius={2} />
+          <Body color={c} w={width * 0.54} h={height * 0.82} radius={7}>
             <View style={{ height: height * 0.08 }} />
-            <Print m={medicine} w={width * 0.68} tight />
+            <Print m={medicine} w={width * 0.54} tight />
           </Body>
         </>
       ) : null}
@@ -210,9 +223,9 @@ export default function Vessel({ medicine, onPress, dimmed, width = VESSEL_W, he
 
 const styles = StyleSheet.create({
   print: { gap: 1 },
-  maker: { fontSize: 6.5, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase' },
-  brand: { fontWeight: '700', letterSpacing: -0.3, marginTop: 2 },
-  salt: { fontSize: 6, fontWeight: '600', letterSpacing: 0.3, textTransform: 'uppercase', marginTop: 2 },
+  maker: { fontSize: 5.5, lineHeight: 8, fontFamily: font.bold, letterSpacing: 0.5, textTransform: 'uppercase' },
+  brand: { fontFamily: font.bold, letterSpacing: -0.3, marginTop: 1 },
+  salt: { fontSize: 5.5, lineHeight: 7.5, fontFamily: font.semibold, letterSpacing: 0.3, textTransform: 'uppercase', marginTop: 2 },
   packetFoot: { position: 'absolute', left: 0, right: 0, bottom: 0 },
   rx: {
     position: 'absolute', top: 2, right: 4,
@@ -220,5 +233,5 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.55)',
   },
-  rxText: { fontSize: 8.5, fontWeight: '800' },
+  rxText: { fontSize: 8.5, fontFamily: font.bold },
 });
