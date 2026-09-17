@@ -121,15 +121,6 @@ export const glass = {
   washCyan: '#BCE8F3',
   washLilac: '#D9D6F8',
   washWarm: '#FDF0F5',
-  // Figma: linear #E7E7E7 -> #DFDFDF at 60%, with a glass effect over it.
-  plateTop: 'rgba(237, 238, 240, 0.97)',
-  plate: 'rgba(228, 230, 233, 0.95)',
-  plateFoot: 'rgba(214, 217, 222, 0.96)',
-  plateEdge: 'rgba(255, 255, 255, 0.7)',
-  screwRim: '#767F8A',
-  screwLight: '#FDFDFE',
-  screwDark: '#AAB3BE',
-  screwSlot: '#69717B',
   /** Figma: active tab #131927, inactive #FFFFFF at 70%. */
   tabInk: '#131927',
   tabIdle: 'rgba(255, 255, 255, 0.7)',

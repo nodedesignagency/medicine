@@ -1,8 +1,8 @@
-import { LinearGradient } from 'expo-linear-gradient';
+import { Image } from 'expo-image';
 import React, { useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Medicine } from '../data/types';
-import { colors, font, glass, radius, type } from '../theme';
+import { colors, font, glass } from '../theme';
 import Vessel, { VESSEL_H, VESSEL_W } from './Vessel';
 
 const GAP = 4;
@@ -20,31 +20,10 @@ const LABEL_TOP = PLATE_TOP + PLATE_H + 14;
 const STAGE_H = LABEL_TOP + 34;
 const PAGE = (VESSEL_W + GAP) * 2;
 
+const PLATE = require('../../assets/shelf-plate.png');
+
 /** "Crocin Advance" on a shelf edge is just "Crocin". */
 const shelfLabel = (brand: string) => (brand.length > 12 ? brand.split(' ')[0] : brand);
-
-/** One of the four machine screws holding the plate to the wall. */
-function Screw({ x, y }: { x: 'l' | 'r'; y: 't' | 'b' }) {
-  return (
-    <View
-      style={[
-        styles.screw,
-        x === 'l' ? { left: 3 } : { right: 3 },
-        y === 't' ? { top: 3 } : { bottom: 3 },
-      ]}
-    >
-      <LinearGradient
-        colors={[glass.screwLight, glass.screwDark]}
-        start={{ x: 0.15, y: 0 }}
-        end={{ x: 0.85, y: 1 }}
-        style={styles.screwFace}
-      >
-        <View style={styles.screwSlotA} />
-        <View style={styles.screwSlotB} />
-      </LinearGradient>
-    </View>
-  );
-}
 
 type Props = {
   title: string;
@@ -105,20 +84,13 @@ export default function GlassShelf({
             <View key={m.id} style={styles.column}>
               <Vessel medicine={m} dimmed={dimmedIds?.includes(m.id)} onPress={() => onPressItem(m)} />
 
-              {/* Drawn over the container so it reads as standing behind glass. */}
-              <View style={styles.plateLayer} pointerEvents="none">
-                <LinearGradient
-                  colors={[glass.plateTop, glass.plate, glass.plateFoot]}
-                  locations={[0, 0.55, 1]}
-                  start={{ x: 0.5, y: 0 }}
-                  end={{ x: 0.5, y: 1 }}
-                  style={styles.plate}
-                >
-                  <View style={styles.plateSheen} />
-                  <Screw x="l" y="t" /><Screw x="r" y="t" />
-                  <Screw x="l" y="b" /><Screw x="r" y="b" />
-                </LinearGradient>
-              </View>
+              {/* The plate exported from Figma — glass effect and screws are baked in. */}
+              <Image
+                source={PLATE}
+                style={styles.plate}
+                contentFit="fill"
+                pointerEvents="none"
+              />
 
               {/* The label sits clear of the plate, the way a shelf edge label does. */}
               <View style={styles.labelSlot}>
@@ -164,30 +136,11 @@ const styles = StyleSheet.create({
   },
   labelPillText: { fontSize: 12, fontFamily: font.regular, color: 'rgba(19,25,39,0.5)' },
 
-  plateLayer: { position: 'absolute', top: PLATE_TOP, left: 0, width: PLATE_W },
   plate: {
-    height: PLATE_H, borderRadius: 8,
-    borderWidth: 1, borderColor: glass.plateEdge,
-    overflow: 'hidden',
-    shadowColor: '#3A4A6B', shadowOpacity: 0.1, shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 }, elevation: 3,
-  },
-  plateSheen: {
-    position: 'absolute', left: 0, right: 0, top: 0, height: 1.5,
-    backgroundColor: 'rgba(255,255,255,0.95)',
+    position: 'absolute', top: PLATE_TOP, left: 0,
+    width: PLATE_W, height: PLATE_H,
   },
 
-  screw: {
-    position: 'absolute', width: 12, height: 12, borderRadius: 6,
-    backgroundColor: glass.screwRim,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  screwFace: {
-    width: 10, height: 10, borderRadius: 5,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  screwSlotA: { position: 'absolute', width: 6.5, height: 1.6, backgroundColor: glass.screwSlot, borderRadius: 1 },
-  screwSlotB: { position: 'absolute', width: 1.6, height: 6.5, backgroundColor: glass.screwSlot, borderRadius: 1 },
 
   rule: { height: 1, backgroundColor: glass.rule, marginHorizontal: PAD, marginTop: 18, marginBottom: 20 },
 });
