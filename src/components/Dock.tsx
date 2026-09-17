@@ -1,7 +1,8 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, glass } from '../theme';
+import { colors } from '../theme';
 import { AskIcon, CameraIcon, ShelfIcon, SlidersIcon } from './Icons';
 
 export type DockTab = 'cabinet' | 'ask' | 'settings';
@@ -18,7 +19,35 @@ const TABS: { id: DockTab; label: string; Icon: typeof ShelfIcon }[] = [
   { id: 'settings', label: 'Settings', Icon: SlidersIcon },
 ];
 
-/** Floating tab pill on the left, scan button on the right. */
+/** Figma values for the dock. */
+const PILL_H = 56;
+const TAB = 48;
+const FAB = 56;
+const GLOW = '#A5CDFF';
+
+/**
+ * A soft light. Figma blurs an ellipse; React Native has no radial gradient, so a linear
+ * one inside a circle stands in — the circle gives the sideways falloff, the gradient the
+ * vertical. Stacked flat circles were tried first and banded visibly at this size.
+ */
+function Glow({
+  d, left, top, alpha, diagonal,
+}: {
+  d: number; left: number; top: number; alpha: number; diagonal?: boolean;
+}) {
+  return (
+    <LinearGradient
+      colors={[`rgba(165,205,255,0)`, `rgba(165,205,255,${alpha * 0.4})`, `rgba(165,205,255,${alpha})`]}
+      locations={[0, 0.55, 1]}
+      start={diagonal ? { x: 1, y: 1 } : { x: 0.5, y: 0 }}
+      end={diagonal ? { x: 0, y: 0 } : { x: 0.5, y: 1 }}
+      style={{ position: 'absolute', width: d, height: d, borderRadius: d / 2, left, top }}
+      pointerEvents="none"
+    />
+  );
+}
+
+/** Tab pill on the left, scan button on the right. */
 export default function Dock({ active, onSelect, onScan }: Props) {
   const insets = useSafeAreaInsets();
 
@@ -48,6 +77,10 @@ export default function Dock({ active, onSelect, onScan }: Props) {
         accessibilityRole="button"
         accessibilityLabel="Scan a medicine"
       >
+        {/* Figma centres one glow just below the bottom edge and one above the top-left;
+            clipping turns them into a bright arc and a faint highlight. */}
+        <Glow d={56} left={0} top={16} alpha={0.92} />
+        <Glow d={40} left={-12} top={-14} alpha={0.4} diagonal />
         <CameraIcon size={22} />
       </Pressable>
     </View>
@@ -60,17 +93,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 20, paddingTop: 10,
   },
-  // Figma: a 160 x 56 row — 4px padding, three 48px tabs, 4px gaps.
+  // Figma: a 160 x 56 row filled #E8EAED — three 48px tabs, ~6px gaps, 2px inset.
   pill: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    padding: 4, borderRadius: 28,
-    backgroundColor: 'rgba(240,240,243,0.93)',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)',
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: 2,
+    height: PILL_H, borderRadius: PILL_H / 2,
+    backgroundColor: '#E8EAED',
     shadowColor: '#3A4A6B', shadowOpacity: 0.12, shadowRadius: 16,
     shadowOffset: { width: 0, height: 8 }, elevation: 5,
   },
   tab: {
-    width: 48, height: 48, borderRadius: 24,
+    width: TAB, height: TAB, borderRadius: TAB / 2,
     alignItems: 'center', justifyContent: 'center',
   },
   tabOn: {
@@ -78,12 +111,13 @@ const styles = StyleSheet.create({
     shadowColor: '#3A4A6B', shadowOpacity: 0.14, shadowRadius: 8,
     shadowOffset: { width: 0, height: 3 }, elevation: 3,
   },
+  // Figma: 56 x 56, radius 48, fill #131927, clip content on.
   fab: {
-    width: 62, height: 62, borderRadius: 999,
-    backgroundColor: '#0E1320',
+    width: FAB, height: FAB, borderRadius: FAB / 2,
+    backgroundColor: '#131927',
     alignItems: 'center', justifyContent: 'center',
-    // The halo in the reference — a coloured shadow rather than a second layer.
-    shadowColor: '#4C7DF0', shadowOpacity: 0.55, shadowRadius: 18,
+    overflow: 'hidden',
+    shadowColor: '#4C7DF0', shadowOpacity: 0.4, shadowRadius: 16,
     shadowOffset: { width: 0, height: 6 }, elevation: 10,
   },
 });
