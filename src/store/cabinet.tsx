@@ -3,6 +3,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import { DEFAULT_CABINET, MEDICINE_BY_ID } from '../data/medicines';
 import { Form, Medicine } from '../data/types';
 import { Profile } from '../logic/advisor';
+import { dropPhoto } from '../logic/cutout';
 
 const CABINET_KEY = 'cabinet.items.v1';
 const SETTINGS_KEY = 'cabinet.settings.v1';
@@ -15,6 +16,8 @@ export type CabinetItem = {
   expiresAt: number;
   /** How much is left in the pack. Optional so cabinets saved before this existed still load. */
   quantity?: number;
+  /** A kept photo of the real pack — a cutout when one was made, else the raw shot. */
+  photo?: string;
   /** Full record for medicines that came from AI recognition rather than the bundled DB. */
   custom?: Medicine;
 };
@@ -100,7 +103,17 @@ export function quantityOf(item: CabinetItem | undefined, m: Medicine | undefine
 /** Which of the two home designs to render. */
 export type HomeStyle = 'glass' | 'shelf';
 
-type Settings = { apiKey: string; profile: Profile; homeStyle: HomeStyle };
+/** Whether shelves show real photos or the drawn containers. */
+export type ShelfImages = 'photo' | 'illustration';
+
+type Settings = {
+  apiKey: string;
+  /** remove.bg key, for turning a hand-held shot into a cutout. */
+  cutoutKey: string;
+  profile: Profile;
+  homeStyle: HomeStyle;
+  shelfImages: ShelfImages;
+};
 
 type Ctx = {
   ready: boolean;
@@ -115,7 +128,12 @@ type Ctx = {
   setApiKey: (key: string) => void;
   setProfile: (p: Profile) => void;
   setHomeStyle: (s: HomeStyle) => void;
+  setShelfImages: (s: ShelfImages) => void;
+  setCutoutKey: (key: string) => void;
   setQuantity: (id: string, n: number) => void;
+  setPhoto: (id: string, uri: string | undefined) => void;
+  /** Photo uri for a medicine, or undefined when it has none. */
+  photoFor: (id: string) => string | undefined;
   resetCabinet: () => void;
 };
 
@@ -124,7 +142,9 @@ const CabinetContext = createContext<Ctx | null>(null);
 export function CabinetProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
   const [items, setItems] = useState<CabinetItem[]>([]);
-  const [settings, setSettings] = useState<Settings>({ apiKey: '', profile: {}, homeStyle: 'glass' });
+  const [settings, setSettings] = useState<Settings>({
+    apiKey: '', cutoutKey: '', profile: {}, homeStyle: 'glass', shelfImages: 'photo',
+  });
 
   // Load once on boot, seeding a starter cabinet the first time the app runs.
   useEffect(() => {
@@ -152,7 +172,10 @@ export function CabinetProvider({ children }: { children: React.ReactNode }) {
           );
         }
         if (rawSettings) {
-          setSettings({ apiKey: '', profile: {}, homeStyle: 'glass', ...JSON.parse(rawSettings) });
+          setSettings({
+            apiKey: '', cutoutKey: '', profile: {}, homeStyle: 'glass', shelfImages: 'photo',
+            ...JSON.parse(rawSettings),
+          });
         }
       } catch {
         // A corrupt store should not brick the app — fall back to an empty cabinet.
@@ -204,6 +227,7 @@ export function CabinetProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const remove = useCallback((id: string) => {
+    dropPhoto(id);
     setItems((prev) => prev.filter((i) => i.medicineId !== id));
   }, []);
 
@@ -221,6 +245,11 @@ export function CabinetProvider({ children }: { children: React.ReactNode }) {
       setApiKey: (apiKey) => setSettings((s) => ({ ...s, apiKey })),
       setProfile: (profile) => setSettings((s) => ({ ...s, profile })),
       setHomeStyle: (homeStyle) => setSettings((s) => ({ ...s, homeStyle })),
+      setShelfImages: (shelfImages) => setSettings((s) => ({ ...s, shelfImages })),
+      setCutoutKey: (cutoutKey) => setSettings((s) => ({ ...s, cutoutKey })),
+      setPhoto: (id, uri) =>
+        setItems((prev) => prev.map((i) => (i.medicineId === id ? { ...i, photo: uri } : i))),
+      photoFor: (id) => items.find((i) => i.medicineId === id)?.photo,
       setQuantity: (id, n) =>
         setItems((prev) =>
           prev.map((i) => (i.medicineId === id ? { ...i, quantity: Math.max(0, n) } : i))

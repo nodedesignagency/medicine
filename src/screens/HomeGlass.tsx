@@ -37,7 +37,7 @@ function TabPill({
 export default function HomeGlass() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { medicines, items, ready, resolve } = useCabinet();
+  const { medicines, items, ready, resolve, settings } = useCabinet();
   const [tab, setTab] = useState<CategoryId | 'all'>('all');
 
   const grouped = useMemo(() => {
@@ -55,6 +55,14 @@ export default function HomeGlass() {
     for (const i of items) out[i.medicineId] = quantityOf(i, resolve(i.medicineId));
     return out;
   }, [items, resolve]);
+
+  // A medicine shows its photo when it has one; everything else keeps the drawn container.
+  const photos = useMemo(() => {
+    if (settings.shelfImages !== 'photo') return {};
+    const out: Record<string, string | undefined> = {};
+    for (const i of items) if (i.photo) out[i.medicineId] = i.photo;
+    return out;
+  }, [items, settings.shelfImages]);
 
   const expired = items.filter((i) => expiryStatus(i) === 'expired');
   const soon = items.filter((i) => expiryStatus(i) === 'soon').length;
@@ -101,6 +109,7 @@ export default function HomeGlass() {
             title={c.title}
             medicines={grouped.get(c.id) ?? []}
             counts={counts}
+            photos={photos}
             dimmedIds={expiredIds}
             showRule={i < shown.length - 1}
             onPressItem={(m) => router.push(`/medicine/${m.id}`)}

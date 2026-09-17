@@ -41,10 +41,12 @@ const labelSize = (name: string) => (name.length > 8 ? 13 : 16);
  * container in a BlurTargetView; iOS blurs whatever is behind and ignores the ref.
  */
 function ShelfItem({
-  medicine, count, dimmed, onPress,
+  medicine, count, photo, dimmed, onPress,
 }: {
   medicine: Medicine;
   count: number;
+  /** A cutout of the real pack. Falls back to the drawn container when absent. */
+  photo?: string;
   dimmed?: boolean;
   onPress: () => void;
 }) {
@@ -53,7 +55,23 @@ function ShelfItem({
   return (
     <View style={styles.column}>
       <BlurTargetView ref={target} style={styles.stand}>
-        <Vessel medicine={medicine} dimmed={dimmed} onPress={onPress} />
+        {photo ? (
+          <Pressable
+            onPress={onPress}
+            style={({ pressed }) => [
+              styles.stand,
+              pressed && { transform: [{ translateY: 2 }, { scale: 0.98 }] },
+              dimmed && { opacity: 0.4 },
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel={`${medicine.brand}, ${medicine.salt}`}
+          >
+            {/* contain, and bottom-aligned, so the pack sits on the plate rather than floating. */}
+            <Image source={{ uri: photo }} style={styles.photo} contentFit="contain" />
+          </Pressable>
+        ) : (
+          <Vessel medicine={medicine} dimmed={dimmed} onPress={onPress} />
+        )}
       </BlurTargetView>
 
       <View style={styles.plate} pointerEvents="none">
@@ -89,12 +107,14 @@ type Props = {
   onPressItem: (m: Medicine) => void;
   /** Units left, keyed by medicine id. */
   counts: Record<string, number>;
+  /** Photo uris, keyed by medicine id. Empty when the shelf is set to illustrations. */
+  photos?: Record<string, string | undefined>;
   dimmedIds?: string[];
   showRule?: boolean;
 };
 
 export default function GlassShelf({
-  title, medicines, onPressItem, counts, dimmedIds, showRule = true,
+  title, medicines, onPressItem, counts, photos, dimmedIds, showRule = true,
 }: Props) {
   const scroller = useRef<ScrollView>(null);
   const [offset, setOffset] = useState(0);
@@ -143,6 +163,7 @@ export default function GlassShelf({
               key={m.id}
               medicine={m}
               count={counts[m.id] ?? 0}
+              photo={photos?.[m.id]}
               dimmed={dimmedIds?.includes(m.id)}
               onPress={() => onPressItem(m)}
             />
@@ -176,6 +197,7 @@ const styles = StyleSheet.create({
   rail: { paddingHorizontal: PAD, gap: GAP, alignItems: 'flex-start' },
   column: { width: VESSEL_W, height: STAGE_H },
   stand: { width: VESSEL_W, height: VESSEL_H },
+  photo: { width: VESSEL_W, height: VESSEL_H },
 
   plate: {
     position: 'absolute', top: PLATE_TOP, left: 0,

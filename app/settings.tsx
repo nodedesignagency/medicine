@@ -5,15 +5,20 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CloseIcon } from '../src/components/Icons';
 import { Button, Card, Chip, Disclaimer, SectionLabel } from '../src/components/ui';
 import { PROFILE_OPTIONS, ProfileKey } from '../src/logic/advisor';
-import { HomeStyle, useCabinet } from '../src/store/cabinet';
+import { HomeStyle, ShelfImages, useCabinet } from '../src/store/cabinet';
 import { alpha, colors, font, radius, type } from '../src/theme';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { settings, setApiKey, setProfile, setHomeStyle, resetCabinet, medicines } = useCabinet();
+  const {
+    settings, setApiKey, setProfile, setHomeStyle, setShelfImages, setCutoutKey,
+    resetCabinet, medicines,
+  } = useCabinet();
   const [draft, setDraft] = useState(settings.apiKey);
   const [saved, setSaved] = useState(false);
+  const [cutDraft, setCutDraft] = useState(settings.cutoutKey);
+  const [cutSaved, setCutSaved] = useState(false);
 
   const toggleProfile = (k: ProfileKey) =>
     setProfile({ ...settings.profile, [k]: !settings.profile[k] });
@@ -102,6 +107,69 @@ export default function SettingsScreen() {
               in between so the key never leaves it.
             </Text>
           </View>
+        </Card>
+
+        <Card style={{ marginTop: 12 }}>
+          <SectionLabel>Shelf images</SectionLabel>
+          <Text style={[type.bodySoft, { fontSize: 13.5, marginBottom: 12 }]}>
+            Scanning keeps a photo of the pack. Photos show on the shelf when a medicine has
+            one; everything else falls back to the drawn container.
+          </Text>
+          <View style={styles.wrap}>
+            {([
+              { id: 'photo', label: 'Photo when there is one' },
+              { id: 'illustration', label: 'Always illustrations' },
+            ] as { id: ShelfImages; label: string }[]).map((o) => (
+              <Chip
+                key={o.id}
+                label={o.label}
+                active={settings.shelfImages === o.id}
+                onPress={() => setShelfImages(o.id)}
+              />
+            ))}
+          </View>
+
+          <Text style={[type.bodySoft, { fontSize: 13.5, marginTop: 16 }]}>
+            With a remove.bg key, a photo of the pack in your hand is cut out — no hand, no
+            background — so it stands on the shelf properly. The first 50 cutouts each month
+            are free. Without a key the raw photo is kept instead.
+          </Text>
+
+          <View style={styles.keyRow}>
+            <TextInput
+              value={cutDraft}
+              onChangeText={(t) => { setCutDraft(t); setCutSaved(false); }}
+              placeholder="remove.bg API key"
+              placeholderTextColor={colors.inkFaint}
+              style={styles.keyInput}
+              autoCapitalize="none"
+              autoCorrect={false}
+              secureTextEntry
+            />
+          </View>
+
+          <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
+            <View style={{ flex: 1 }}>
+              <Button
+                label={cutSaved ? 'Saved' : 'Save key'}
+                onPress={() => { setCutoutKey(cutDraft.trim()); setCutSaved(true); }}
+                disabled={!cutDraft.trim() || cutSaved}
+              />
+            </View>
+            {settings.cutoutKey ? (
+              <View style={{ flex: 1 }}>
+                <Button
+                  label="Clear"
+                  tone="ghost"
+                  onPress={() => { setCutoutKey(''); setCutDraft(''); setCutSaved(false); }}
+                />
+              </View>
+            ) : null}
+          </View>
+
+          <Pressable onPress={() => Linking.openURL('https://www.remove.bg/api')}>
+            <Text style={styles.link}>Get a free key at remove.bg →</Text>
+          </Pressable>
         </Card>
 
         <Card style={{ marginTop: 12 }}>

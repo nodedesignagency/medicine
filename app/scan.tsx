@@ -13,6 +13,7 @@ import { Button } from '../src/components/ui';
 import { MEDICINE_BY_ID } from '../src/data/medicines';
 import { Medicine } from '../src/data/types';
 import { recognizeMedicine, searchMedicines } from '../src/logic/ai';
+import { cutout, keepPhoto } from '../src/logic/cutout';
 import { useCabinet } from '../src/store/cabinet';
 import { rememberPending } from '../src/store/pending';
 import { alpha, colors, font, radius, shadow, type } from '../src/theme';
@@ -24,6 +25,7 @@ const COMMON = ['dolo650', 'combiflam', 'digene', 'cetzine', 'sinarest', 'eno', 
 type Phase =
   | { k: 'camera' }
   | { k: 'reading' }
+  | { k: 'cutting' }
   | { k: 'picker'; note?: string }
   | { k: 'error'; message: string };
 
@@ -34,10 +36,12 @@ const buzz = (style: Haptics.ImpactFeedbackStyle = Haptics.ImpactFeedbackStyle.M
 export default function ScanScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { settings } = useCabinet();
+  const { settings, add, has, setPhoto } = useCabinet();
   const camera = useRef<CameraView>(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [phase, setPhase] = useState<Phase>({ k: 'camera' });
+  // Held between the shot and the moment a medicine is chosen.
+  const [shot, setShot] = useState<string | undefined>();
 
   const sweep = useRef(new Animated.Value(0)).current;
 
@@ -52,29 +56,71 @@ export default function ScanScreen() {
     return () => loop.stop();
   }, [sweep]);
 
-  const open = (m: Medicine) => {
+  /**
+   * Put the medicine away, and keep the photo of it. Scanning something you are holding
+   * means you own it, so it goes on the shelf — the detail screen can still remove it.
+   */
+  const open = async (m: Medicine, photoUri = shot) => {
     rememberPending(m);
+    if (!has(m.id)) add(m);
+
+    if (!photoUri) {
+      router.replace(`/medicine/${m.id}`);
+      return;
+    }
+
+    let kept: string | undefined;
+    try {
+      kept = keepPhoto(photoUri, m.id);
+      setPhoto(m.id, kept);
+    } catch {
+      // Keeping the photo is a bonus; never block the scan on it.
+    }
+
+    if (kept && settings.cutoutKey) {
+      setPhase({ k: 'cutting' });
+      const out = await cutout(kept, settings.cutoutKey, m.id);
+      if (out.status === 'ok') setPhoto(m.id, out.uri);
+    }
+
     router.replace(`/medicine/${m.id}`);
   };
 
   const capture = async () => {
     buzz();
-    if (!settings.apiKey) {
-      // No key: the camera still framed the shot, the match just happens by hand.
-      setPhase({ k: 'picker', note: 'Demo mode — pick what you are holding. Add an AI key in Settings and the camera will read the box itself.' });
-      return;
-    }
-    setPhase({ k: 'reading' });
+
+    // Take the shot first either way — the photo is what ends up on the shelf, and it
+    // does not depend on having an AI key.
+    let photoUri: string | undefined;
     try {
       const photo = await camera.current?.takePictureAsync({ quality: 0.7 });
-      if (!photo?.uri) {
-        setPhase({ k: 'error', message: 'The camera did not return a photo. Try again.' });
-        return;
-      }
-      const outcome = await recognizeMedicine(photo.uri, settings.apiKey);
+      photoUri = photo?.uri;
+      setShot(photoUri);
+    } catch {
+      // A camera that will not return a photo still leaves the manual path open.
+    }
+
+    if (!settings.apiKey) {
+      setPhase({
+        k: 'picker',
+        note: photoUri
+          ? 'Pick what you photographed and it goes on the shelf. Add an AI key in Settings and the camera will name it itself.'
+          : 'Demo mode — pick what you are holding. Add an AI key in Settings and the camera will read the box itself.',
+      });
+      return;
+    }
+
+    if (!photoUri) {
+      setPhase({ k: 'error', message: 'The camera did not return a photo. Try again.' });
+      return;
+    }
+
+    setPhase({ k: 'reading' });
+    try {
+      const outcome = await recognizeMedicine(photoUri, settings.apiKey);
       if (outcome.status === 'ok') {
         buzz(Haptics.ImpactFeedbackStyle.Light);
-        open(outcome.result.medicine);
+        await open(outcome.result.medicine, photoUri);
       } else if (outcome.status === 'not-found') {
         setPhase({ k: 'picker', note: 'Could not read a medicine name in that photo. Search for it instead.' });
       } else {
@@ -153,14 +199,17 @@ export default function ScanScreen() {
 
           <Text style={styles.mode}>
             {settings.apiKey ? 'AI reading is on' : 'Demo mode'}
+            {settings.cutoutKey ? ' · cutout on' : ''}
           </Text>
         </View>
       </View>
 
-      {phase.k === 'reading' ? (
+      {phase.k === 'reading' || phase.k === 'cutting' ? (
         <View style={styles.reading}>
           <ActivityIndicator color="#FFFFFF" />
-          <Text style={styles.readingText}>Reading the label…</Text>
+          <Text style={styles.readingText}>
+            {phase.k === 'cutting' ? 'Cutting it out of the photo…' : 'Reading the label…'}
+          </Text>
         </View>
       ) : null}
 
