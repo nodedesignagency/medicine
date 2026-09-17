@@ -127,7 +127,7 @@ export const glass = {
   rule: 'rgba(11, 11, 15, 0.08)',
   chipIdle: 'rgba(255, 255, 255, 0.62)',
   chipEdge: 'rgba(255, 255, 255, 0.9)',
-  underline: '#6C5CE7',
+  underline: '#8286F5',
   muted: '#9AA0AA',
 };
 

@@ -190,11 +190,17 @@ const styles = StyleSheet.create({
   },
   /** Figma: Regular 16. */
   labelName: { fontSize: 16, lineHeight: 20, fontFamily: font.regular, letterSpacing: -0.24, color: INK, flexShrink: 1 },
+  /**
+   * Figma: 26 x 18, 4px padding, 45 radius, #F6F6F6. minWidth rather than a fixed 26 so a
+   * three-digit count (100 ml of syrup) grows instead of clipping.
+   */
   labelPill: {
-    minWidth: 26, paddingHorizontal: 8, paddingVertical: 3,
-    borderRadius: 999, backgroundColor: 'rgba(19,25,39,0.06)', alignItems: 'center',
+    minWidth: 26, height: 18, paddingHorizontal: 4,
+    borderRadius: 45, backgroundColor: '#F6F6F6',
+    alignItems: 'center', justifyContent: 'center',
   },
-  labelPillText: { fontSize: 14, fontFamily: font.regular, letterSpacing: -0.21, color: 'rgba(19,25,39,0.55)' },
+  /** Figma: Regular 12 on #131927 at full strength. */
+  labelPillText: { fontSize: 12, fontFamily: font.regular, letterSpacing: -0.18, color: INK },
 
   rule: { height: 1, backgroundColor: glass.rule, marginHorizontal: PAD, marginTop: 18, marginBottom: 20 },
 });

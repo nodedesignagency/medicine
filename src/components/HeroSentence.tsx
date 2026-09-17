@@ -1,18 +1,19 @@
 import React from 'react';
-import { Platform, StyleSheet, Text, TextStyle } from 'react-native';
+import { StyleSheet, Text, TextStyle } from 'react-native';
 import { colors, glass, type } from '../theme';
 
 /**
  * The headline is the status. Counts and the phrase that matters are set in black and
  * underlined; everything else drops back to grey so the sentence reads at a glance.
  *
- * `textDecorationColor` is iOS-only in React Native, so Android gets the same underline
- * in the text colour rather than the accent. The emphasis still reads either way.
+ * `textDecorationColor` is documented iOS-only, but it is also honoured on web and simply
+ * ignored on Android — so it is set unconditionally rather than gated to one platform.
+ * Android therefore draws the underline in the text colour, which still reads as emphasis.
  */
 const strong: TextStyle = {
   color: colors.ink,
   textDecorationLine: 'underline',
-  ...Platform.select({ ios: { textDecorationColor: glass.underline } }),
+  textDecorationColor: glass.underline,
 };
 
 type Props = { total: number; expired: number; soon: number };

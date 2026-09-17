@@ -60,16 +60,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 20, paddingTop: 10,
   },
+  // Figma: a 160 x 56 row — 4px padding, three 48px tabs, 4px gaps.
   pill: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
-    padding: 5, borderRadius: 999,
-    backgroundColor: 'rgba(252,253,255,0.94)',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.95)',
+    padding: 4, borderRadius: 28,
+    backgroundColor: 'rgba(240,240,243,0.93)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)',
     shadowColor: '#3A4A6B', shadowOpacity: 0.12, shadowRadius: 16,
     shadowOffset: { width: 0, height: 8 }, elevation: 5,
   },
   tab: {
-    width: 52, height: 52, borderRadius: 999,
+    width: 48, height: 48, borderRadius: 24,
     alignItems: 'center', justifyContent: 'center',
   },
   tabOn: {

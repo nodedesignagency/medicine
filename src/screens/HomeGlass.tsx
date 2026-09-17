@@ -127,20 +127,24 @@ const styles = StyleSheet.create({
   hero: { paddingHorizontal: 20, paddingBottom: 26 },
   tabs: { paddingHorizontal: 20, gap: 8, paddingBottom: 26 },
 
-  // Figma: 10px padding, 10px gap, 13px radius, Instrument Sans 14 at -1.5% tracking.
+  /**
+   * Figma: 10px padding, 13px radius, Instrument Sans 14 at -1.5%, #131927 / white.
+   * Figma's 10px gap is split either side of the divider, and its 10px vertical padding
+   * assumes a 10px-tall text box — React Native's line box is ~17, so 6 lands the same 30.
+   */
   tabPill: {
-    flexDirection: 'row', alignItems: 'center', gap: 10,
-    paddingHorizontal: 15, paddingVertical: 6, borderRadius: 13,
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    paddingHorizontal: 10, paddingVertical: 6, borderRadius: 13,
     backgroundColor: glass.tabIdle,
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.85)',
   },
   tabPillOn: { backgroundColor: glass.tabInk, borderColor: glass.tabInk },
   tabLabel: { fontSize: 14, fontFamily: font.regular, color: glass.tabInk, letterSpacing: -0.21 },
   tabLabelOn: { color: '#FFFFFF' },
-  tabRule: { width: 1, height: 12, backgroundColor: 'rgba(19,25,39,0.22)' },
-  tabRuleOn: { backgroundColor: 'rgba(255,255,255,0.32)' },
-  tabCount: { fontSize: 14, fontFamily: font.regular, color: 'rgba(19,25,39,0.45)', letterSpacing: -0.21 },
-  tabCountOn: { color: 'rgba(255,255,255,0.7)' },
+  tabRule: { width: 1, height: 12, backgroundColor: 'rgba(19,25,39,0.2)' },
+  tabRuleOn: { backgroundColor: 'rgba(255,255,255,0.3)' },
+  tabCount: { fontSize: 14, fontFamily: font.regular, color: glass.tabInk, letterSpacing: -0.21 },
+  tabCountOn: { color: '#FFFFFF' },
 
   empty: { alignItems: 'center', paddingVertical: 60, paddingHorizontal: 40 },
 });
