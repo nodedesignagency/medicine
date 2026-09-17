@@ -1,7 +1,7 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { colors } from '../theme';
 import { AskIcon, CameraIcon, ShelfIcon, SlidersIcon } from './Icons';
 
@@ -26,24 +26,35 @@ const FAB = 56;
 const GLOW = '#A5CDFF';
 
 /**
- * A soft light. Figma blurs an ellipse; React Native has no radial gradient, so a linear
- * one inside a circle stands in — the circle gives the sideways falloff, the gradient the
- * vertical. Stacked flat circles were tried first and banded visibly at this size.
+ * The two lights inside the scan button, to the Figma values: a 27.82 ellipse of #A5CDFF
+ * with a 23.56 layer blur, stacked twice under Plus lighter.
+ *
+ * A blurred circle is a radial gradient, which React Native has no native primitive for —
+ * hence SVG. The blur widens the 27.82 circle to roughly a 37 radius, and the second
+ * stacked copy is what makes the core read bright rather than washed.
  */
-function Glow({
-  d, left, top, alpha, diagonal,
-}: {
-  d: number; left: number; top: number; alpha: number; diagonal?: boolean;
-}) {
+const GLOW_R = 37;
+
+function Glows() {
+  const stops = (id: string, cx: number, cy: number) => (
+    <RadialGradient key={id} id={id} cx={cx} cy={cy} r={GLOW_R} gradientUnits="userSpaceOnUse">
+      <Stop offset="0" stopColor={GLOW} stopOpacity="1" />
+      <Stop offset="0.45" stopColor={GLOW} stopOpacity="0.5" />
+      <Stop offset="1" stopColor={GLOW} stopOpacity="0" />
+    </RadialGradient>
+  );
+
   return (
-    <LinearGradient
-      colors={[`rgba(165,205,255,0)`, `rgba(165,205,255,${alpha * 0.4})`, `rgba(165,205,255,${alpha})`]}
-      locations={[0, 0.55, 1]}
-      start={diagonal ? { x: 1, y: 1 } : { x: 0.5, y: 0 }}
-      end={diagonal ? { x: 0, y: 0 } : { x: 0.5, y: 1 }}
-      style={{ position: 'absolute', width: d, height: d, borderRadius: d / 2, left, top }}
-      pointerEvents="none"
-    />
+    <Svg width={FAB} height={FAB} style={StyleSheet.absoluteFill} pointerEvents="none">
+      <Defs>
+        {/* Figma frame origins plus half the ellipse: (14.09 + 13.91, 51.09 + 13.91) and (-8 + 13.91, -22 + 13.91). */}
+        {stops('glowBottom', 28, 65)}
+        {stops('glowTop', 5.91, -8.09)}
+      </Defs>
+      <Rect width={FAB} height={FAB} fill="url(#glowBottom)" />
+      <Rect width={FAB} height={FAB} fill="url(#glowBottom)" />
+      <Rect width={FAB} height={FAB} fill="url(#glowTop)" />
+    </Svg>
   );
 }
 
@@ -77,10 +88,7 @@ export default function Dock({ active, onSelect, onScan }: Props) {
         accessibilityRole="button"
         accessibilityLabel="Scan a medicine"
       >
-        {/* Figma centres one glow just below the bottom edge and one above the top-left;
-            clipping turns them into a bright arc and a faint highlight. */}
-        <Glow d={56} left={0} top={16} alpha={0.92} />
-        <Glow d={40} left={-12} top={-14} alpha={0.4} diagonal />
+        <Glows />
         <CameraIcon size={22} />
       </Pressable>
     </View>
@@ -117,7 +125,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#131927',
     alignItems: 'center', justifyContent: 'center',
     overflow: 'hidden',
-    shadowColor: '#4C7DF0', shadowOpacity: 0.4, shadowRadius: 16,
+    shadowColor: '#4C7DF0', shadowOpacity: 0.22, shadowRadius: 14,
     shadowOffset: { width: 0, height: 6 }, elevation: 10,
   },
 });
